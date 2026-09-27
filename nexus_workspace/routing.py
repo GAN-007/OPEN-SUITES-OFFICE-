@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .system_one import SystemOneDecisionPlane
 
 from .models import Capability, EngineName, RouteDecision, RouteRequest
 
@@ -28,6 +32,9 @@ OWNERSHIP = (
 
 
 class CapabilityRouter:
+    def __init__(self, decision_plane: "SystemOneDecisionPlane | None" = None):
+        self.decision_plane = decision_plane
+
     def route(self, request: RouteRequest) -> RouteDecision:
         if request.capability is not None:
             owner = next(item for item in OWNERSHIP if item.capability == request.capability)
@@ -45,7 +52,30 @@ class CapabilityRouter:
             score = sum(1 for keyword in owner.keywords if keyword in text)
             scored.append((score, -index, owner))
         score, _, owner = max(scored, key=lambda item: (item[0], item[1]))
+
+        signal = self.decision_plane.classify(request.intent) if self.decision_plane is not None else None
+
         if score == 0:
             owner = next(item for item in OWNERSHIP if item.engine == EngineName.OPEN_WEBUI)
-            return RouteDecision(engine=owner.engine, capability=owner.capability, reason="No specialist signal detected; routed to the general AI workspace.")
+            if (
+                signal is not None
+                and getattr(self.decision_plane, "mode", "shadow") == "assist"
+                and signal.confidence >= getattr(self.decision_plane, "confidence_threshold", 1.0)
+                and signal.engine != EngineName.OPEN_WEBUI
+            ):
+                assisted_owner = next(item for item in OWNERSHIP if item.engine == signal.engine)
+                return RouteDecision(
+                    engine=assisted_owner.engine,
+                    capability=assisted_owner.capability,
+                    reason=(
+                        "System-One assist resolved an otherwise ambiguous Nexus route "
+                        f"with confidence {signal.confidence:.3f}. "
+                        "Nexus approval and provenance rules remain authoritative."
+                    ),
+                )
+            return RouteDecision(
+                engine=owner.engine,
+                capability=owner.capability,
+                reason="No specialist signal detected; routed to the general AI workspace.",
+            )
         return RouteDecision(engine=owner.engine, capability=owner.capability, reason=owner.reason)
