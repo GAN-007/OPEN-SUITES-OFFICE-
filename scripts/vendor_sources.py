@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import shutil
@@ -17,10 +16,17 @@ LOCK_PATH = ROOT / "sources.lock.json"
 MANIFEST_PATH = ROOT / "engines" / "VENDOR_MANIFEST.json"
 
 
-def run(command: list[str], cwd: Path | None = None, *, capture: bool = False) -> str:
+def run(
+    command: list[str],
+    cwd: Path | None = None,
+    *,
+    capture: bool = False,
+    input_text: str | None = None,
+) -> str:
     proc = subprocess.run(
         command,
         cwd=str(cwd) if cwd else None,
+        input=input_text,
         text=True,
         stdout=subprocess.PIPE if capture else None,
         stderr=subprocess.PIPE if capture else None,
@@ -64,106 +70,65 @@ def remove_excluded_paths(destination: Path, excluded_paths: list[str]) -> None:
             target.unlink()
 
 
-def file_digest(path: Path) -> str:
-    digest = hashlib.sha256()
-    if path.is_symlink():
-        digest.update(b"SYMLINK\0")
-        digest.update(os.readlink(path).encode("utf-8", errors="surrogateescape"))
-        return digest.hexdigest()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+def git_tree_for_checkout(checkout: Path, excluded_paths: list[str]) -> tuple[str, str]:
+    original = run(["git", "rev-parse", "HEAD^{tree}"], checkout, capture=True)
+    if not excluded_paths:
+        return original, original
+
+    for relative in excluded_paths:
+        run(["git", "rm", "-r", "--cached", "--ignore-unmatch", "--", relative], checkout)
+    expected = run(["git", "write-tree"], checkout, capture=True)
+    return original, expected
 
 
-def tree_fingerprint(root: Path) -> dict:
-    aggregate = hashlib.sha256()
-    count = 0
-    total_bytes = 0
-    largest: list[tuple[int, str]] = []
-
-    for path in sorted(root.rglob("*"), key=lambda item: item.as_posix()):
-        if path.is_dir() and not path.is_symlink():
+def index_entries(prefix: str) -> list[tuple[str, str, str]]:
+    raw = run(["git", "ls-files", "-s", "-z", "--", prefix], ROOT, capture=True)
+    entries: list[tuple[str, str, str]] = []
+    for record in raw.split("\0"):
+        if not record:
             continue
-        relative = path.relative_to(root).as_posix()
-        digest = file_digest(path)
-        mode = stat.S_IMODE(path.lstat().st_mode)
-        size = path.lstat().st_size if not path.is_symlink() else len(os.readlink(path).encode())
-        aggregate.update(relative.encode("utf-8", errors="surrogateescape"))
-        aggregate.update(b"\0")
-        aggregate.update(f"{mode:o}".encode())
-        aggregate.update(b"\0")
-        aggregate.update(str(size).encode())
-        aggregate.update(b"\0")
-        aggregate.update(digest.encode())
-        aggregate.update(b"\n")
-        count += 1
-        total_bytes += size
-        largest.append((size, relative))
-
-    largest.sort(reverse=True)
-    return {
-        "file_count": count,
-        "total_bytes": total_bytes,
-        "aggregate_sha256": aggregate.hexdigest(),
-        "largest_files": [{"path": path, "bytes": size} for size, path in largest[:20]],
-    }
+        metadata, path = record.split("\t", 1)
+        mode, sha, stage = metadata.split(" ")
+        if stage != "0":
+            raise RuntimeError(f"Unmerged index entry while vendoring: {path}")
+        entries.append((mode, sha, path))
+    return entries
 
 
-def materialize_source(source: dict, scratch: Path) -> dict:
-    name = source["name"]
-    repository = source["repository"]
-    commit = source["commit"]
-    destination = ROOT / source["path"]
-    clone = scratch / name
+def blob_sizes(shas: list[str]) -> dict[str, int]:
+    unique = list(dict.fromkeys(shas))
+    if not unique:
+        return {}
+    output = run(
+        ["git", "cat-file", "--batch-check=%(objectname) %(objecttype) %(objectsize)"],
+        ROOT,
+        capture=True,
+        input_text="\n".join(unique) + "\n",
+    )
+    sizes: dict[str, int] = {}
+    for line in output.splitlines():
+        sha, object_type, size = line.split(" ", 2)
+        if object_type != "blob":
+            raise RuntimeError(f"Expected blob {sha}, got {object_type}")
+        sizes[sha] = int(size)
+    return sizes
 
-    print(f"==> {name}: cloning {repository}")
-    run(["git", "clone", "--filter=blob:none", "--no-checkout", repository, str(clone)])
-    try:
-        run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], cwd=clone, capture=True)
-    except RuntimeError:
-        run(["git", "fetch", "--depth", "1", "origin", commit], cwd=clone)
 
-    run(["git", "-c", "advice.detachedHead=false", "checkout", "--detach", commit], cwd=clone)
-    actual = run(["git", "rev-parse", "HEAD"], cwd=clone, capture=True)
-    if actual != commit:
-        raise RuntimeError(f"{name}: expected {commit}, checked out {actual}")
-
-    gitmodules = clone / ".gitmodules"
-    nested_submodules = False
-    if gitmodules.exists():
-        nested_submodules = True
-        print(f"==> {name}: materializing nested submodules")
-        run(["git", "submodule", "sync", "--recursive"], cwd=clone)
-        run(["git", "submodule", "update", "--init", "--recursive"], cwd=clone)
-
-    print(f"==> {name}: copying source into {destination.relative_to(ROOT)}")
-    copy_worktree(clone, destination)
-
-    excluded = list(source.get("excluded_paths", []))
-    remove_excluded_paths(destination, excluded)
-
-    if not (destination / "LICENSE").exists() and not (destination / "LICENSE.md").exists():
-        print(f"WARNING: {name} has no root LICENSE file at the vendored destination", file=sys.stderr)
-
-    fingerprint = tree_fingerprint(destination)
-    return {
-        "name": name,
-        "source_repository": repository,
-        "source_commit": commit,
-        "vendored_path": source["path"],
-        "license": source["license"],
-        "excluded_paths": excluded,
-        "restriction": source.get("restriction"),
-        "nested_submodules_materialized": nested_submodules,
-        **fingerprint,
-    }
+def target_subtree_sha(prefix: str) -> str:
+    root_tree = run(["git", "write-tree"], ROOT, capture=True)
+    row = run(["git", "ls-tree", root_tree, "--", prefix], ROOT, capture=True)
+    if not row:
+        raise RuntimeError(f"Unable to resolve staged tree for {prefix}")
+    metadata, _path = row.split("\t", 1)
+    mode, object_type, sha = metadata.split(" ")
+    if mode != "040000" or object_type != "tree":
+        raise RuntimeError(f"{prefix} is not staged as a normal Git tree")
+    return sha
 
 
 def remove_legacy_gitlinks(lock: dict) -> None:
-    gitmodules = ROOT / ".gitmodules"
-    if gitmodules.exists():
-        run(["git", "rm", "-f", ".gitmodules"], cwd=ROOT)
+    if (ROOT / ".gitmodules").exists():
+        run(["git", "rm", "-f", ".gitmodules"], ROOT)
 
     for source in lock["sources"]:
         legacy = source.get("legacy_submodule_path")
@@ -176,7 +141,7 @@ def remove_legacy_gitlinks(lock: dict) -> None:
             stderr=subprocess.DEVNULL,
         )
         if tracked.returncode == 0:
-            run(["git", "rm", "-f", legacy], cwd=ROOT)
+            run(["git", "rm", "-f", legacy], ROOT)
         else:
             path = ROOT / legacy
             if path.exists():
@@ -202,47 +167,129 @@ def main() -> int:
     if not isinstance(sources, list) or len(sources) != 10:
         raise RuntimeError("sources.lock.json must contain exactly ten engines")
 
+    # Remove any previously vendored engine files from both worktree and index.
+    subprocess.run(
+        ["git", "rm", "-r", "-f", "--cached", "--ignore-unmatch", "engines"],
+        cwd=ROOT,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
     engines_root = ROOT / "engines"
     if engines_root.exists():
-        for child in engines_root.iterdir():
-            if child.name == "VENDOR_MANIFEST.json":
-                child.unlink()
-            elif child.is_dir():
-                shutil.rmtree(child)
-            else:
-                child.unlink()
-    else:
-        engines_root.mkdir(parents=True)
+        shutil.rmtree(engines_root)
+    engines_root.mkdir(parents=True)
 
-    results: list[dict] = []
+    provisional: list[dict] = []
     with tempfile.TemporaryDirectory(prefix="nexus-vendor-") as temp:
         scratch = Path(temp)
         for source in sources:
-            results.append(materialize_source(source, scratch))
+            name = source["name"]
+            repository = source["repository"]
+            commit = source["commit"]
+            destination = ROOT / source["path"]
+            clone = scratch / name
+
+            print(f"==> {name}: cloning {repository}")
+            run(["git", "clone", "--filter=blob:none", "--no-checkout", repository, str(clone)])
+            try:
+                run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], clone, capture=True)
+            except RuntimeError:
+                run(["git", "fetch", "--depth", "1", "origin", commit], clone)
+
+            run(
+                ["git", "-c", "advice.detachedHead=false", "checkout", "--detach", commit],
+                clone,
+            )
+            actual = run(["git", "rev-parse", "HEAD"], clone, capture=True)
+            if actual != commit:
+                raise RuntimeError(f"{name}: expected {commit}, checked out {actual}")
+
+            nested_submodules = False
+            if (clone / ".gitmodules").exists():
+                nested_submodules = True
+                run(["git", "submodule", "sync", "--recursive"], clone)
+                run(["git", "submodule", "update", "--init", "--recursive"], clone)
+
+            excluded = list(source.get("excluded_paths", []))
+            original_tree, expected_tree = git_tree_for_checkout(clone, excluded)
+
+            print(f"==> {name}: copying source into {destination.relative_to(ROOT)}")
+            copy_worktree(clone, destination)
+            remove_excluded_paths(destination, excluded)
+
+            provisional.append(
+                {
+                    "name": name,
+                    "source_repository": repository,
+                    "source_commit": commit,
+                    "source_tree_sha": original_tree,
+                    "expected_vendored_tree_sha": expected_tree,
+                    "vendored_path": source["path"],
+                    "license": source["license"],
+                    "excluded_paths": excluded,
+                    "restriction": source.get("restriction"),
+                    "nested_submodules_materialized": nested_submodules,
+                }
+            )
+
+    if not args.keep_legacy_submodules:
+        remove_legacy_gitlinks(lock)
+
+    # Stage root changes normally, then force-stage engine trees so files tracked
+    # upstream remain tracked even when their own nested .gitignore matches them.
+    run(["git", "add", "-A"], ROOT)
+    run(["git", "add", "-f", "--", "engines"], ROOT)
+
+    results: list[dict] = []
+    for item in provisional:
+        prefix = item["vendored_path"]
+        entries = index_entries(prefix)
+        subtree = target_subtree_sha(prefix)
+        if subtree != item["expected_vendored_tree_sha"]:
+            raise RuntimeError(
+                f"{item['name']}: staged Git tree {subtree} does not match "
+                f"the canonical upstream tree {item['expected_vendored_tree_sha']}"
+            )
+
+        sizes = blob_sizes([sha for _mode, sha, _path in entries])
+        total_bytes = sum(sizes[sha] for _mode, sha, _path in entries)
+        results.append(
+            {
+                **item,
+                "git_tree_sha": subtree,
+                "tracked_entry_count": len(entries),
+                "canonical_blob_bytes": total_bytes,
+            }
+        )
 
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "snapshot_date": lock["snapshot_date"],
         "storage_model": "vendored-source-tree",
+        "integrity_model": "canonical-git-tree",
         "engine_count": len(results),
+        "tracked_entry_count": sum(item["tracked_entry_count"] for item in results),
+        "canonical_blob_bytes": sum(item["canonical_blob_bytes"] for item in results),
         "engines": results,
     }
     MANIFEST_PATH.write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-
-    if not args.keep_legacy_submodules:
-        remove_legacy_gitlinks(lock)
+    run(["git", "add", "-f", "--", str(MANIFEST_PATH.relative_to(ROOT))], ROOT)
 
     print("\nVendored engine summary")
     for item in results:
         print(
-            f"  {item['name']:<18} files={item['file_count']:<6} "
-            f"bytes={item['total_bytes']:<12} sha256={item['aggregate_sha256'][:16]}..."
+            f"  {item['name']:<18} entries={item['tracked_entry_count']:<6} "
+            f"bytes={item['canonical_blob_bytes']:<12} tree={item['git_tree_sha'][:16]}..."
         )
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except Exception as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        raise SystemExit(1)

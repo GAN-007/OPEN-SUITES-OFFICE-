@@ -34,31 +34,18 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Configure Git and LFS
+      - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git lfs install --local
 
       - name: Verify immutable source lock
         run: python scripts/verify_lock.py
 
-      - name: Materialize all redistributable engine source trees
+      - name: Materialize and stage canonical engine trees
         run: python scripts/vendor_sources.py
 
-      - name: Put unusually large source assets under Git LFS
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r -d '' path; do
-            echo "LFS: $path"
-            git lfs track "$path"
-          done < <(find engines -type f -size +90M -print0)
-
-      - name: Stage vendored tree before index-level verification
-        run: git add -A
-
-      - name: Verify vendored integrity
+      - name: Verify canonical vendored integrity
         run: python scripts/verify_vendored.py --require
 
       - name: Verify capability roots
@@ -79,5 +66,5 @@ jobs:
             echo "Vendored tree already matches the source lock."
             exit 0
           fi
-          git commit -m "vendor: bring all engine source trees in-house [vendor-generated]"
+          git commit -m "vendor: canonicalize all in-house engine source trees [vendor-generated]"
           git push origin HEAD:${GITHUB_REF_NAME}
