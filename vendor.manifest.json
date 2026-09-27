@@ -4,39 +4,6 @@
   "snapshot_date": "2026-09-27",
   "engines": [
     {
-      "name": "agent-reach",
-      "repository": "https://github.com/Panniantong/Agent-Reach.git",
-      "commit": "a19a171fa980a0785849596492e0af4db800c82f",
-      "source_path": "upstream/agent-reach",
-      "vendor_path": "engines/agent-reach",
-      "file_count": 122,
-      "tree_sha256": "6031d5e0897a107723988fb71008a56b2681bb60302e9aedb33de6b00f1856ae",
-      "restricted_paths": [],
-      "license": "MIT"
-    },
-    {
-      "name": "browser-use",
-      "repository": "https://github.com/browser-use/browser-use.git",
-      "commit": "4cbe921673b48a488f5415d9159249afd12a625b",
-      "source_path": "upstream/browser-use",
-      "vendor_path": "engines/browser-use",
-      "file_count": 518,
-      "tree_sha256": "5b9954fa2387ddb00b1754644440bdbafaec75cd623dcb8062ffc6f5d18c2e42",
-      "restricted_paths": [],
-      "license": "MIT"
-    },
-    {
-      "name": "cognee",
-      "repository": "https://github.com/topoteretes/cognee.git",
-      "commit": "eb90d03740755f5252b8b12cce91fd09970f2d81",
-      "source_path": "upstream/cognee",
-      "vendor_path": "engines/cognee",
-      "file_count": 3883,
-      "tree_sha256": "cfc643aaf1ae42ba97ef6cc6f771ac4de8a1f1b723130c50448bb894e4a1b720",
-      "restricted_paths": [],
-      "license": "Apache-2.0"
-    },
-    {
       "name": "genoffice",
       "repository": "https://github.com/genspark-ai/genoffice.git",
       "commit": "d9cd4895b99b3e65aa8beea13f95b232329f4c11",
@@ -51,29 +18,9 @@
           "local_overlay_supported": true
         }
       ],
-      "license": "Apache-2.0 for core; ee/ uses GenOffice Enterprise License"
-    },
-    {
-      "name": "graphiti",
-      "repository": "https://github.com/getzep/graphiti.git",
-      "commit": "6b4b56ff6f4b1e4e69c3c3c5487cf1b8762c483a",
-      "source_path": "upstream/graphiti",
-      "vendor_path": "engines/graphiti",
-      "file_count": 384,
-      "tree_sha256": "7c5f54e057343b2ab5a715df4a71e0e406772ed30d83d05e32f3e04e6038d218",
-      "restricted_paths": [],
-      "license": "Apache-2.0"
-    },
-    {
-      "name": "open-webui",
-      "repository": "https://github.com/open-webui/open-webui.git",
-      "commit": "8bd8b4fac5e059578ac0c74b3c18d11139f88b7d",
-      "source_path": "upstream/open-webui",
-      "vendor_path": "engines/open-webui",
-      "file_count": 5065,
-      "tree_sha256": "5575570f464187d4b61726bb0a799c8f5f7ceab87f0d4cd02b5f8fe76ada6662",
-      "restricted_paths": [],
-      "license": "Open WebUI License; source redistribution permitted while current branding-preservation and other license conditions are retained"
+      "license": "Apache-2.0 for core; ee/ uses GenOffice Enterprise License",
+      "git_file_count": 3659,
+      "git_tree_sha256": "2ed8ae43eb56929e1f7966a3fec39f05cae1369fa239a26c61f25aeaf2918d95"
     },
     {
       "name": "openmaic",
@@ -84,29 +31,9 @@
       "file_count": 3126,
       "tree_sha256": "c3e486f2710bbf542693976b075a2034120c94cf70588f4ace1dbf2955e917d0",
       "restricted_paths": [],
-      "license": "MIT"
-    },
-    {
-      "name": "pageindex",
-      "repository": "https://github.com/VectifyAI/PageIndex.git",
-      "commit": "037a7dbacfb9a19f38b354ce60cee5094b3f854c",
-      "source_path": "upstream/pageindex",
-      "vendor_path": "engines/pageindex",
-      "file_count": 177,
-      "tree_sha256": "ae7913a3ffbec858d2d9b30d4b6ef6095261388cc290db67ab2f94b94edaa767",
-      "restricted_paths": [],
-      "license": "MIT"
-    },
-    {
-      "name": "qwen-audio-agent",
-      "repository": "https://github.com/QwenAudio/qwen-audio-agent.git",
-      "commit": "a73bcbc2e1278bf664df38bdd169ffba1fb2451f",
-      "source_path": "upstream/qwen-audio-agent",
-      "vendor_path": "engines/qwen-audio-agent",
-      "file_count": 1418,
-      "tree_sha256": "96e24c16bd5baf4840b1517c428f9035b6040d2fb8d7d58cfbbf1462a3c137c4",
-      "restricted_paths": [],
-      "license": "Apache-2.0"
+      "license": "MIT",
+      "git_file_count": 3126,
+      "git_tree_sha256": "b68b348f1ce0696e807deb304d442ba5e76d1bf3e800dbe2f63ab7412b1a92ab"
     },
     {
       "name": "weknora",
@@ -117,7 +44,100 @@
       "file_count": 4604,
       "tree_sha256": "725caf0763a95d343caee99e041e5eee0210f88b91d12bf78b28a344d5f404a6",
       "restricted_paths": [],
-      "license": "MIT core with third-party component notices"
+      "license": "MIT core with third-party component notices",
+      "git_file_count": 4604,
+      "git_tree_sha256": "07ae0abe9811ad55f2aed325744cc71d14a2567fe3e654caa35ae49106f93666"
+    },
+    {
+      "name": "graphiti",
+      "repository": "https://github.com/getzep/graphiti.git",
+      "commit": "6b4b56ff6f4b1e4e69c3c3c5487cf1b8762c483a",
+      "source_path": "upstream/graphiti",
+      "vendor_path": "engines/graphiti",
+      "file_count": 384,
+      "tree_sha256": "7c5f54e057343b2ab5a715df4a71e0e406772ed30d83d05e32f3e04e6038d218",
+      "restricted_paths": [],
+      "license": "Apache-2.0",
+      "git_file_count": 384,
+      "git_tree_sha256": "8d9e91dc4ecf9bf93cd10f015ef7b1b4dbf36df7e991d6c84a3a232725770572"
+    },
+    {
+      "name": "cognee",
+      "repository": "https://github.com/topoteretes/cognee.git",
+      "commit": "eb90d03740755f5252b8b12cce91fd09970f2d81",
+      "source_path": "upstream/cognee",
+      "vendor_path": "engines/cognee",
+      "file_count": 3883,
+      "tree_sha256": "cfc643aaf1ae42ba97ef6cc6f771ac4de8a1f1b723130c50448bb894e4a1b720",
+      "restricted_paths": [],
+      "license": "Apache-2.0",
+      "git_file_count": 3883,
+      "git_tree_sha256": "6eaa5b461c53302af31c100ce53bad934149091223d39600a766c666b353592f"
+    },
+    {
+      "name": "browser-use",
+      "repository": "https://github.com/browser-use/browser-use.git",
+      "commit": "4cbe921673b48a488f5415d9159249afd12a625b",
+      "source_path": "upstream/browser-use",
+      "vendor_path": "engines/browser-use",
+      "file_count": 518,
+      "tree_sha256": "5b9954fa2387ddb00b1754644440bdbafaec75cd623dcb8062ffc6f5d18c2e42",
+      "restricted_paths": [],
+      "license": "MIT",
+      "git_file_count": 518,
+      "git_tree_sha256": "ee0cd147b0d032904b56263dd8d5e4c3b61fdc609cfa2ade4941905e9f461e9b"
+    },
+    {
+      "name": "open-webui",
+      "repository": "https://github.com/open-webui/open-webui.git",
+      "commit": "8bd8b4fac5e059578ac0c74b3c18d11139f88b7d",
+      "source_path": "upstream/open-webui",
+      "vendor_path": "engines/open-webui",
+      "file_count": 5065,
+      "tree_sha256": "5575570f464187d4b61726bb0a799c8f5f7ceab87f0d4cd02b5f8fe76ada6662",
+      "restricted_paths": [],
+      "license": "Open WebUI License; source redistribution permitted while current branding-preservation and other license conditions are retained",
+      "git_file_count": 5065,
+      "git_tree_sha256": "ba289da9340d93beabfa7a8188294143b347fc41afc1fd5a505ebf81bf406f1d"
+    },
+    {
+      "name": "pageindex",
+      "repository": "https://github.com/VectifyAI/PageIndex.git",
+      "commit": "037a7dbacfb9a19f38b354ce60cee5094b3f854c",
+      "source_path": "upstream/pageindex",
+      "vendor_path": "engines/pageindex",
+      "file_count": 177,
+      "tree_sha256": "ae7913a3ffbec858d2d9b30d4b6ef6095261388cc290db67ab2f94b94edaa767",
+      "restricted_paths": [],
+      "license": "MIT",
+      "git_file_count": 177,
+      "git_tree_sha256": "498e253be71034229d62b5f3e374260ba4aaab81c44fa5b089dc3941e4bb097c"
+    },
+    {
+      "name": "agent-reach",
+      "repository": "https://github.com/Panniantong/Agent-Reach.git",
+      "commit": "a19a171fa980a0785849596492e0af4db800c82f",
+      "source_path": "upstream/agent-reach",
+      "vendor_path": "engines/agent-reach",
+      "file_count": 122,
+      "tree_sha256": "6031d5e0897a107723988fb71008a56b2681bb60302e9aedb33de6b00f1856ae",
+      "restricted_paths": [],
+      "license": "MIT",
+      "git_file_count": 122,
+      "git_tree_sha256": "600758a67dc3f4ea986ddb86726abffb64608541a7ac3b2114b3c56b2b76ad63"
+    },
+    {
+      "name": "qwen-audio-agent",
+      "repository": "https://github.com/QwenAudio/qwen-audio-agent.git",
+      "commit": "a73bcbc2e1278bf664df38bdd169ffba1fb2451f",
+      "source_path": "upstream/qwen-audio-agent",
+      "vendor_path": "engines/qwen-audio-agent",
+      "file_count": 1418,
+      "tree_sha256": "96e24c16bd5baf4840b1517c428f9035b6040d2fb8d7d58cfbbf1462a3c137c4",
+      "restricted_paths": [],
+      "license": "Apache-2.0",
+      "git_file_count": 1418,
+      "git_tree_sha256": "8602da78378e384bd812b82229f81248f922daea5234fe5af17489d794dde2fe"
     }
   ]
 }
