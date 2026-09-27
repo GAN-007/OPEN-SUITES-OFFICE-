@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-suites-office.local/schemas/provenance.schema.json",
+  "title": "Nexus Provenance Record",
+  "type": "object",
+  "required": ["id", "execution_id", "actor", "engine", "capability", "action", "request", "result", "created_at"],
+  "properties": {
+    "id": {"type": "string", "format": "uuid"},
+    "execution_id": {"type": "string", "format": "uuid"},
+    "actor": {"type": "string", "minLength": 1},
+    "engine": {"type": "string", "minLength": 1},
+    "capability": {"type": "string", "minLength": 1},
+    "action": {"type": "string", "minLength": 1},
+    "request": {"type": "object"},
+    "result": {"type": "object"},
+    "created_at": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": false
+}

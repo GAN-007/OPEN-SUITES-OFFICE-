@@ -1,0 +1,19 @@
+version: 1
+owners:
+  office_documents: genoffice
+  classroom: openmaic
+  enterprise_knowledge: weknora
+  temporal_knowledge: graphiti
+  memory: cognee
+  browser_automation: browser-use
+  ai_workspace: open-webui
+  long_document_retrieval: pageindex
+  internet_research: agent-reach
+  realtime_voice: qwen-audio-agent
+principles:
+  - original_assets_are_stored_once
+  - specialist_engines_receive_asset_references_or_derived_indexes
+  - temporal_facts_belong_to_graphiti
+  - durable_agent_memory_belongs_to_cognee
+  - long_document_structure_belongs_to_pageindex
+  - enterprise_permissions_are_enforced_by_weknora_and_nexus

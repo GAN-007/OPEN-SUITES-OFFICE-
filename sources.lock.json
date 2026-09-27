@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-27",
+  "sources": [
+    {
+      "name": "genoffice",
+      "repository": "https://github.com/genspark-ai/genoffice.git",
+      "commit": "d9cd4895b99b3e65aa8beea13f95b232329f4c11",
+      "branch": "main",
+      "license": "Apache-2.0 for core; ee/ uses GenOffice Enterprise License",
+      "path": "upstream/genoffice"
+    },
+    {
+      "name": "openmaic",
+      "repository": "https://github.com/THU-MAIC/OpenMAIC.git",
+      "commit": "f2875426ae5712d26f0a76e54e9de763e86027a6",
+      "branch": "main",
+      "license": "MIT",
+      "path": "upstream/openmaic"
+    },
+    {
+      "name": "weknora",
+      "repository": "https://github.com/Tencent/WeKnora.git",
+      "commit": "9114e4e4f905be71976a77c684d3f92731e6f9a6",
+      "branch": "main",
+      "license": "MIT core with third-party component notices",
+      "path": "upstream/weknora"
+    },
+    {
+      "name": "graphiti",
+      "repository": "https://github.com/getzep/graphiti.git",
+      "commit": "6b4b56ff6f4b1e4e69c3c3c5487cf1b8762c483a",
+      "branch": "main",
+      "license": "Apache-2.0",
+      "path": "upstream/graphiti"
+    },
+    {
+      "name": "cognee",
+      "repository": "https://github.com/topoteretes/cognee.git",
+      "commit": "eb90d03740755f5252b8b12cce91fd09970f2d81",
+      "branch": "main",
+      "license": "Apache-2.0",
+      "path": "upstream/cognee"
+    },
+    {
+      "name": "browser-use",
+      "repository": "https://github.com/browser-use/browser-use.git",
+      "commit": "4cbe921673b48a488f5415d9159249afd12a625b",
+      "branch": "main",
+      "license": "MIT",
+      "path": "upstream/browser-use"
+    },
+    {
+      "name": "open-webui",
+      "repository": "https://github.com/open-webui/open-webui.git",
+      "commit": "8bd8b4fac5e059578ac0c74b3c18d11139f88b7d",
+      "branch": "main",
+      "license": "Open WebUI License; branding preservation requirements apply to current code",
+      "path": "upstream/open-webui"
+    },
+    {
+      "name": "pageindex",
+      "repository": "https://github.com/VectifyAI/PageIndex.git",
+      "commit": "037a7dbacfb9a19f38b354ce60cee5094b3f854c",
+      "branch": "main",
+      "license": "MIT",
+      "path": "upstream/pageindex"
+    },
+    {
+      "name": "agent-reach",
+      "repository": "https://github.com/Panniantong/Agent-Reach.git",
+      "commit": "a19a171fa980a0785849596492e0af4db800c82f",
+      "branch": "main",
+      "license": "MIT",
+      "path": "upstream/agent-reach"
+    },
+    {
+      "name": "qwen-audio-agent",
+      "repository": "https://github.com/QwenAudio/qwen-audio-agent.git",
+      "commit": "a73bcbc2e1278bf664df38bdd169ffba1fb2451f",
+      "branch": "main",
+      "license": "Apache-2.0",
+      "path": "upstream/qwen-audio-agent"
+    }
+  ]
+}

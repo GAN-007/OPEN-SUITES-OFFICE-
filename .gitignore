@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+.env
+state/*.db
+artifacts/*
+!artifacts/.gitkeep
+reports/source-audit.json
+upstream/*
+!upstream/.gitkeep

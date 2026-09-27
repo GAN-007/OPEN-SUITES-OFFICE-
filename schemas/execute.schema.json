@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-suites-office.local/schemas/execute.schema.json",
+  "title": "Nexus Execute Request",
+  "type": "object",
+  "required": ["intent", "action"],
+  "properties": {
+    "intent": {"type": "string", "minLength": 1},
+    "action": {"type": "string", "minLength": 1},
+    "arguments": {"type": "object", "default": {}},
+    "capability": {"type": ["string", "null"]},
+    "engine": {"type": ["string", "null"]},
+    "risk": {"enum": ["read", "write", "external_side_effect"]},
+    "approved": {"type": "boolean", "default": false},
+    "actor": {"type": "string", "default": "local-user"}
+  },
+  "additionalProperties": false
+}

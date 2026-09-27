@@ -1,0 +1,16 @@
+{
+  "snapshot_date": "2026-09-27",
+  "repositories": [
+    {"name":"genoffice","repo":"genspark-ai/genoffice","commit":"d9cd4895b99b3e65aa8beea13f95b232329f4c11","tracked_files_observed":3661,"major_roots":{"apps":2378,"packages":1061,"e2e":104,"docs":48,"tools":34}},
+    {"name":"openmaic","repo":"THU-MAIC/OpenMAIC","commit":"f2875426ae5712d26f0a76e54e9de763e86027a6","tracked_files_observed":3126,"major_roots":{"tests":791,"packages":752,"lib":719,"components":370,"app":86}},
+    {"name":"weknora","repo":"Tencent/WeKnora","commit":"9114e4e4f905be71976a77c684d3f92731e6f9a6","tracked_files_observed":4604,"major_roots":{"internal":2398,"frontend":862,"cli":311,"migrations":302,"website-docs":215}},
+    {"name":"graphiti","repo":"getzep/graphiti","commit":"6b4b56ff6f4b1e4e69c3c3c5487cf1b8762c483a","tracked_files_observed":384,"major_roots":{"graphiti_core":159,"mcp_server":60,"tests":56,"examples":28,"server":17}},
+    {"name":"cognee","repo":"topoteretes/cognee","commit":"eb90d03740755f5252b8b12cce91fd09970f2d81","tracked_files_observed":3883,"major_roots":{"cognee":2706,"cognee-frontend":658,"examples":148,"evals":82,"cognee-mcp":20}},
+    {"name":"browser-use","repo":"browser-use/browser-use","commit":"4cbe921673b48a488f5415d9159249afd12a625b","tracked_files_observed":518,"major_roots":{"browser_use":187,"tests":130,"examples":121,"skills":28}},
+    {"name":"open-webui","repo":"open-webui/open-webui","commit":"8bd8b4fac5e059578ac0c74b3c18d11139f88b7d","tracked_files_observed":5065,"major_roots":{"static":3874,"src":829,"backend":295}},
+    {"name":"pageindex","repo":"VectifyAI/PageIndex","commit":"037a7dbacfb9a19f38b354ce60cee5094b3f854c","tracked_files_observed":177,"major_roots":{"pageindex":105,"tests":18,"examples":17,"assets":12}},
+    {"name":"agent-reach","repo":"Panniantong/Agent-Reach","commit":"a19a171fa980a0785849596492e0af4db800c82f","tracked_files_observed":122,"major_roots":{"agent_reach":51,"tests":35,"docs":19}},
+    {"name":"qwen-audio-agent","repo":"QwenAudio/qwen-audio-agent","commit":"a73bcbc2e1278bf664df38bdd169ffba1fb2451f","tracked_files_observed":1418,"major_roots":{"server":414,"examples":385,"docs":171,"desktop":96,"mobile":81,"web":63,"shared":52,"test":48}}
+  ],
+  "total_tracked_files_observed": 22958
+}
