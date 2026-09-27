@@ -13,6 +13,7 @@ from .database import Database
 from .models import AssetCreate, AssetVersion, ExecuteRequest, ExecuteResult, RouteDecision, RouteRequest
 from .routing import CapabilityRouter
 from .service import ApprovalRequired, NexusService
+from .system_one import SystemOneDecisionPlane
 
 
 @lru_cache
@@ -36,8 +37,26 @@ def assets() -> AssetStore:
 
 
 @lru_cache
+def decision_router() -> CapabilityRouter:
+    cfg = settings()
+    plane = SystemOneDecisionPlane(
+        mode=cfg.system_one_mode,
+        base_url=cfg.system_one_base_url,
+        api_key=cfg.system_one_api_key,
+        timeout_seconds=cfg.system_one_timeout_seconds,
+        confidence_threshold=cfg.system_one_confidence_threshold,
+    )
+    return CapabilityRouter(decision_plane=plane)
+
+
+@lru_cache
 def service() -> NexusService:
-    return NexusService(db(), adapters(), CapabilityRouter(), settings().require_approval_for_side_effects)
+    return NexusService(
+        db(),
+        adapters(),
+        decision_router(),
+        settings().require_approval_for_side_effects,
+    )
 
 
 app = FastAPI(title="OPEN SUITES OFFICE — Nexus Control Plane", version="0.1.0")
@@ -55,7 +74,7 @@ def engines() -> list[dict]:
 
 @app.post("/v1/route", response_model=RouteDecision)
 def route(request: RouteRequest) -> RouteDecision:
-    return CapabilityRouter().route(request)
+    return decision_router().route(request)
 
 
 @app.post("/v1/execute", response_model=ExecuteResult)

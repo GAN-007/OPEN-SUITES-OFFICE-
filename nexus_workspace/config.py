@@ -19,6 +19,14 @@ class Settings(BaseSettings):
     execution_timeout_seconds: int = Field(default=120, ge=1, le=3600)
     require_approval_for_side_effects: bool = True
 
+    # Optional Laya/Jev-compatible System-One decision plane.
+    # off: disabled; shadow: observe only; assist: resolve ambiguous fallback routes only.
+    system_one_mode: str = "off"
+    system_one_base_url: str | None = None
+    system_one_api_key: str | None = None
+    system_one_timeout_seconds: float = Field(default=1.5, ge=0.1, le=30)
+    system_one_confidence_threshold: float = Field(default=0.85, ge=0.0, le=1.0)
+
     openmaic_url: str | None = None
     weknora_url: str | None = None
     graphiti_mcp_url: str | None = None
