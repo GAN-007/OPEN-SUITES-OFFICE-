@@ -30,14 +30,19 @@ jobs:
         run: python scripts/verify_lock.py
       - name: Materialize complete redistributable engine sources
         run: python scripts/vendor_upstreams.py
-      - name: Verify source-to-vendor parity
+      - name: Stage complete engine source snapshots
+        run: git add -f engines
+      - name: Finalize Git-canonical vendor manifest
+        run: |
+          python scripts/finalize_vendor_manifest.py
+          git add -f vendor.manifest.json
+      - name: Verify canonical source-to-vendor parity
         run: python scripts/verify_vendored.py --compare-sources
       - name: Commit vendored source snapshots
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f engines vendor.manifest.json
           if git diff --cached --quiet; then
             echo "Vendored source is already synchronized."
             exit 0

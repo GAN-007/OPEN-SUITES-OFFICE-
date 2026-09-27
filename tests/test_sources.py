@@ -20,6 +20,8 @@ def test_vendor_manifest_contains_all_ten_engines() -> None:
         assert (ROOT / entry["vendor_path"]).is_dir()
         assert entry["file_count"] > 0
         assert len(entry["tree_sha256"]) == 64
+        assert entry["git_file_count"] > 0
+        assert len(entry["git_tree_sha256"]) == 64
 
 
 def test_runtime_defaults_to_vendored_source() -> None:
