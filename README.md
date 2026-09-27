@@ -1,55 +1,87 @@
 # OPEN SUITES OFFICE — Nexus
 
-**More useful every day. Not another list of chatbots.**
+**One repository. Ten specialist AI engines. One control plane.**
 
-OPEN SUITES OFFICE — Nexus is a lossless AI-workspace federation that preserves and unifies ten specialist AI systems instead of reimplementing reduced copies of them. The complete upstream repositories are pinned as Git submodules, while Nexus-owned code provides routing, approvals, immutable assets, provenance, orchestration boundaries, deployment infrastructure and a single control-plane API.
+Nexus 0.2 is no longer a submodule federation. The redistributable source code
+for GenOffice, OpenMAIC, WeKnora, Graphiti, Cognee, Browser Use, Open WebUI,
+PageIndex, Agent-Reach, and Qwen Audio Agent is vendored directly under
+`engines/` at immutable audited revisions. Nexus routes, starts, tests, and
+invokes those in-repository implementations through a common API and CLI while
+preserving each engine's native UI, CLI, SDK, MCP/ACP/A2A interfaces, database
+model, test suite, and license boundary.
 
-## Complete upstream engines
+## What “in-house” means here
 
-| Engine | Pinned role in Nexus | Native surfaces preserved |
-|---|---|---|
-| GenOffice | Native Office/PDF/Markdown/HTML editing | Electron apps, engines, CLI, MCP, skills |
-| OpenMAIC | Multi-agent interactive classroom | Workbench, classroom, quizzes, PBL, whiteboard, exports, skills |
-| WeKnora | Enterprise knowledge and agent workflows | RAG, Agent, Wiki, RBAC, MCP, sandboxes, connectors |
-| Graphiti | Temporal context graph | Python library, MCP, graph drivers, temporal search |
-| Cognee | Durable agent memory | remember/recall/improve/forget, graph/vector/code memory, MCP/API |
-| Browser Use | Stateful browser automation | Agent, browser runtime, tools, MCP, cloud/local integrations |
-| Open WebUI | General self-hosted AI workspace | Svelte UI, FastAPI backend, RAG, tools, skills, models |
-| PageIndex | Reasoning-based long-document retrieval | Local SDK, Flash indexer, agent integrations |
-| Agent-Reach | Source-specific internet acquisition | CLI, channel backends, diagnostics, skills |
-| Qwen Audio Agent | Realtime voice/task presence | Web/TUI/Desktop/mobile, unified runtime, ACP/A2A backends |
+A normal clone contains the implementation source itself:
 
-The exact upstream SHAs are in [`sources.lock.json`](sources.lock.json). The submodule gitlinks point to those same SHAs, so a recursive clone materializes the complete audited source trees rather than partial ports or generated approximations.
+```text
+engines/
+├── genoffice/
+├── openmaic/
+├── weknora/
+├── graphiti/
+├── cognee/
+├── browser-use/
+├── open-webui/
+├── pageindex/
+├── agent-reach/
+└── qwen-audio-agent/
+```
 
-## Clone everything
+There is no runtime requirement to initialize `upstream/*` submodules or
+download those repositories before Nexus can inspect, build, test, or invoke
+their code.
+
+The exact source commit, redistribution boundary, and original repository for
+each engine are recorded in `sources.lock.json`; integrity fingerprints are in
+`engines/VENDOR_MANIFEST.json`.
+
+## Capability ownership
+
+| Engine | In-repository capabilities retained |
+|---|---|
+| **GenOffice** | Docs, Sheets, Slides, PDF, Markdown, HTML, Office engines, AI agent core, CLI, MCP, skills, rendering/conversion pipelines |
+| **OpenMAIC** | Agent workbench, generation, multi-agent orchestration, classroom playback, quizzes, PBL, whiteboards, materials, skills, PPTX/HTML export |
+| **WeKnora** | Enterprise knowledge bases, document ingestion, RAG, ReAct Agent, Wiki, RBAC/workspaces, MCP, sandboxes, browser/search skills, migrations |
+| **Graphiti** | Temporal knowledge graph, episodes, entities, edges, validity windows, hybrid search, graph drivers, MCP |
+| **Cognee** | remember, recall, improve, forget, session memory, graph/vector/code retrieval, API, MCP, UI |
+| **Browser Use** | Browser agent, navigation, clicking, typing, forms, tabs, profiles, extraction, screenshots, sessions, MCP |
+| **Open WebUI** | Models, agents, tools, skills, RAG, memory, channels, calendar, automations, voice/video, image generation, analytics, RBAC, PWA |
+| **PageIndex** | Hierarchical tree indexing, vectorless reasoning retrieval, local chat, Flash indexing, SDK integrations |
+| **Agent-Reach** | Web read/search plus source-specific GitHub, X/Twitter, Reddit, LinkedIn, YouTube, Bilibili, RSS and diagnostic/fallback channels |
+| **Qwen Audio Agent** | Full-duplex voice, interruption, background tasks, unified gateway, ACP/A2A backends, memory/knowledge, Web/TUI/Desktop/mobile frontends |
+
+Nexus itself owns cross-engine routing, execution policy, process management,
+immutable asset versions, provenance, and cross-engine workflow composition.
+
+## License boundary that cannot be flattened
+
+GenOffice's open/core source is Apache-2.0 and is vendored. Its upstream
+`ee/` directory is governed by a separate GenOffice Enterprise License that
+does **not** permit public redistribution without an appropriate agreement.
+Therefore `engines/genoffice/ee` is deliberately excluded and CI fails if it
+appears. This is a legal redistribution boundary, not a hidden technical
+dependency.
+
+Open WebUI remains under its own Open WebUI License and its branding is retained
+as required by that license. Every vendored engine retains its own LICENSE,
+NOTICE, third-party notices, and attribution files.
+
+## Verify the complete in-tree build
 
 ```bash
-git clone --recurse-submodules https://github.com/GAN-007/OPEN-SUITES-OFFICE-.git
+git clone https://github.com/GAN-007/OPEN-SUITES-OFFICE-.git
 cd OPEN-SUITES-OFFICE-
+
 python3 scripts/verify_lock.py
-python3 scripts/verify_submodules.py
+python3 scripts/verify_vendored.py --require
+python3 scripts/verify_engine_contracts.py
 ```
 
-If the repository was cloned without submodules:
+The vendored verifier recomputes the file count, byte count, and aggregate
+SHA-256 tree fingerprint for every engine and rejects legacy gitlinks.
 
-```bash
-make bootstrap
-```
-
-## What Nexus adds
-
-Nexus does not replace specialist engines. It adds the missing cross-product layer:
-
-- **Capability routing** sends Office work to GenOffice, temporal facts to Graphiti, durable memory to Cognee, enterprise KB questions to WeKnora, long-document structural queries to PageIndex, web actions to Browser Use, source-specific research to Agent-Reach, general model work to Open WebUI, classrooms to OpenMAIC and realtime voice to Qwen Audio Agent.
-- **Immutable asset versioning** stores original bytes once and creates content-addressed versions rather than destructive overwrites.
-- **Cross-engine provenance** records actor, engine, capability, action, request, output and execution IDs for reconstructable work.
-- **Side-effect approvals** prevent externally observable actions from being executed through the Nexus control plane unless the caller explicitly approves them.
-- **Polyglot preservation** keeps native TypeScript/Node, Go, Python, Rust/native components, browser runtimes and databases intact.
-- **Reproducible parity gates** run each upstream project's own build/test command at its locked revision instead of substituting Nexus mocks for upstream behavior.
-
-## Control-plane API
-
-Create a local environment and run the API:
+## Nexus control plane
 
 ```bash
 python3 -m venv .venv
@@ -59,39 +91,67 @@ cp .env.example .env
 nexus serve
 ```
 
-The service exposes:
+Main surfaces:
 
-- `GET /health` — Nexus and adapter configuration status.
-- `GET /v1/engines` — all ten engine transports.
-- `POST /v1/route` — deterministic capability ownership routing.
-- `POST /v1/execute` — execute through the selected adapter with approval enforcement and provenance.
-- `POST /v1/assets` — create immutable content-addressed asset versions.
-- `GET /v1/provenance/{id}` — retrieve the audit chain for an execution.
+- `GET /` — build identity and source model.
+- `GET /health` — Nexus, adapter, and native-engine state.
+- `GET /v1/engines` — all specialist adapters.
+- `GET /v1/native/engines` — all in-tree runtimes, capabilities, commands, and process state.
+- `POST /v1/native/engines/{engine}/start` — start a registered long-running engine.
+- `POST /v1/native/engines/{engine}/stop` — stop it.
+- `POST /v1/native/engines/{engine}/install|build|test` — run the native phase against the vendored tree.
+- `POST /v1/route` — choose the canonical specialist.
+- `POST /v1/execute` — invoke it with approval and provenance enforcement.
+- `POST /v1/assets` — immutable content-addressed asset versions.
+- `GET /v1/provenance/{id}` — reconstruct execution lineage.
 
-Interactive OpenAPI documentation is served at `/docs`.
-
-## Infrastructure
-
-A local development data plane is provided for the shared services Nexus and several upstream engines commonly require:
+## One CLI
 
 ```bash
-docker compose -f infra/docker-compose.yml up -d
+nexus engine list
+nexus engine status graphiti
+nexus engine install genoffice
+nexus engine build genoffice
+nexus engine test genoffice
+nexus engine start openmaic
+nexus route "compare section 18.4 with appendix C in this 900-page report"
+nexus serve
 ```
 
-This launches PostgreSQL, Redis, FalkorDB, Qdrant and MinIO with persistent local volumes. Production deployments must replace the development credentials and apply TLS, secret management, network isolation, SSO/RBAC, immutable image digests and sandbox policies.
+CLI-style engines execute from their vendored trees. PageIndex is imported from
+its vendored SDK tree. Service engines run their native server/MCP surfaces from
+their vendored source and are addressed at non-conflicting Nexus defaults.
+
+## Refreshing an engine without losing provenance
+
+Source upgrades are explicit, not floating:
+
+1. update the exact SHA in `sources.lock.json`;
+2. run `python scripts/vendor_sources.py`;
+3. review original license/notice changes;
+4. run integrity and capability-root verification;
+5. run Nexus tests;
+6. run the affected engine's native install/build/test gates;
+7. run cross-engine acceptance scenarios;
+8. commit the resulting source-tree delta.
+
+The vendorizer strips nested Git metadata but preserves source files, modes,
+symlinks, nested submodule contents, license files, and notices. It never copies
+a path listed in `excluded_paths`.
 
 ## Tests
 
-Nexus-owned integration code:
+Nexus integration layer:
 
 ```bash
-pip install -e '.[dev]'
 python scripts/verify_lock.py
-ruff check nexus_workspace tests scripts
+python scripts/verify_vendored.py --require
+python scripts/verify_engine_contracts.py
+python -m compileall -q nexus_workspace scripts tests
 pytest
 ```
 
-Native upstream parity gates are deliberately separate because they preserve each project's real toolchain:
+Native engine gates:
 
 ```bash
 python scripts/engine_tasks.py install --engine genoffice --stop-on-failure
@@ -99,29 +159,26 @@ python scripts/engine_tasks.py build --engine genoffice --stop-on-failure
 python scripts/engine_tasks.py test --engine genoffice --stop-on-failure
 ```
 
-The manual `Upstream Parity Gates` GitHub Actions workflow can run the same install/build/test sequence independently for all ten engines.
+The GitHub **Vendored Engine Native Parity** matrix can run these phases for all
+ten engines independently.
 
-## Source-of-truth rules
+## Data ownership
 
 | Information / operation | Canonical owner |
 |---|---|
-| Office document structure and fidelity | GenOffice |
+| Office document structure/fidelity | GenOffice |
 | Classroom/course state | OpenMAIC |
-| Enterprise knowledge base / Wiki | WeKnora |
-| Time-varying facts | Graphiti |
+| Enterprise KB/Wiki | WeKnora |
+| Temporal facts/history | Graphiti |
 | Durable agent/user/project memory | Cognee |
 | Stateful browser interaction | Browser Use |
-| General model/chat workspace | Open WebUI |
+| General AI workspace | Open WebUI |
 | Long-document structural retrieval | PageIndex |
 | Source-specific internet acquisition | Agent-Reach |
-| Realtime voice interaction | Qwen Audio Agent |
-| Cross-engine workflow/audit state | Nexus |
-| File/version metadata | Nexus Asset Store |
+| Realtime voice/task presence | Qwen Audio Agent |
+| Cross-engine workflow/audit | Nexus |
+| Asset/version identity | Nexus Asset Store |
 
-This avoids copying every document into every retrieval system. The original asset is stored once; engines receive the reference or derivative index they actually need.
-
-## License boundaries
-
-The Apache-2.0 `LICENSE` at the root covers only Nexus-owned integration code. The ten submodules remain governed by their own upstream terms. Current Open WebUI source includes branding-preservation requirements, and GenOffice's `ee/` directory has a separate enterprise license. Nexus intentionally keeps these source and license boundaries visible.
-
-For the detailed architecture, failure domains, data flows and parity definition, see [`NEXUS_ARCHITECTURE.md`](NEXUS_ARCHITECTURE.md) and [`docs/RUNTIME.md`](docs/RUNTIME.md).
+For implementation boundaries and acceptance gates, see
+[`NEXUS_ARCHITECTURE.md`](NEXUS_ARCHITECTURE.md) and
+[`docs/RUNTIME.md`](docs/RUNTIME.md).

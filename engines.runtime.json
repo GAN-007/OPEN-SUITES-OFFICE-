@@ -1,0 +1,446 @@
+{
+  "schema_version": 2,
+  "engines": {
+    "genoffice": {
+      "path": "engines/genoffice",
+      "kind": "cli+desktop+mcp",
+      "install": [
+        [
+          "npm",
+          "ci"
+        ]
+      ],
+      "build": [
+        [
+          "npm",
+          "run",
+          "build:all"
+        ]
+      ],
+      "test": [
+        [
+          "npm",
+          "test"
+        ]
+      ],
+      "start": null,
+      "cli": [
+        "packages/cli/bin/genoffice"
+      ],
+      "env": {},
+      "capabilities": [
+        "docs",
+        "sheets",
+        "slides",
+        "pdf",
+        "markdown",
+        "html",
+        "agent-core",
+        "cli",
+        "mcp",
+        "office-roundtrip"
+      ]
+    },
+    "openmaic": {
+      "path": "engines/openmaic",
+      "kind": "web+agent-runtime",
+      "install": [
+        [
+          "corepack",
+          "pnpm",
+          "install",
+          "--frozen-lockfile"
+        ]
+      ],
+      "build": [
+        [
+          "corepack",
+          "pnpm",
+          "build"
+        ]
+      ],
+      "test": [
+        [
+          "corepack",
+          "pnpm",
+          "test"
+        ]
+      ],
+      "start": [
+        "corepack",
+        "pnpm",
+        "start"
+      ],
+      "cli": null,
+      "env": {
+        "PORT": "3001"
+      },
+      "capabilities": [
+        "multi-agent-classroom",
+        "workbench",
+        "generation",
+        "orchestration",
+        "playback",
+        "quiz",
+        "pbl",
+        "whiteboard",
+        "materials",
+        "pptx-export",
+        "html-export",
+        "skills"
+      ]
+    },
+    "weknora": {
+      "path": "engines/weknora",
+      "kind": "go+web+mcp",
+      "install": [
+        [
+          "go",
+          "mod",
+          "download"
+        ]
+      ],
+      "build": [
+        [
+          "make",
+          "build"
+        ]
+      ],
+      "test": [
+        [
+          "make",
+          "test"
+        ]
+      ],
+      "start": [
+        "make",
+        "run"
+      ],
+      "cli": null,
+      "env": {
+        "APP_PORT": "8080"
+      },
+      "capabilities": [
+        "rag",
+        "react-agent",
+        "wiki",
+        "rbac",
+        "mcp",
+        "sandbox",
+        "browser-skill",
+        "model-management",
+        "knowledge-bases"
+      ]
+    },
+    "graphiti": {
+      "path": "engines/graphiti",
+      "kind": "python+mcp",
+      "install": [
+        [
+          "uv",
+          "sync",
+          "--all-extras",
+          "--dev"
+        ],
+        [
+          "uv",
+          "sync",
+          "--project",
+          "mcp_server",
+          "--extra",
+          "providers"
+        ]
+      ],
+      "build": [],
+      "test": [
+        [
+          "uv",
+          "run",
+          "pytest"
+        ]
+      ],
+      "start": [
+        "uv",
+        "run",
+        "--project",
+        "mcp_server",
+        "python",
+        "mcp_server/main.py",
+        "--config",
+        "../../config/graphiti-mcp.yaml",
+        "--port",
+        "8002"
+      ],
+      "cli": null,
+      "env": {
+        "PYTHONPATH": "."
+      },
+      "capabilities": [
+        "temporal-knowledge-graph",
+        "episodes",
+        "entities",
+        "relations",
+        "hybrid-search",
+        "mcp",
+        "falkordb",
+        "neo4j"
+      ]
+    },
+    "cognee": {
+      "path": "engines/cognee",
+      "kind": "python+api+mcp",
+      "install": [
+        [
+          "uv",
+          "sync"
+        ]
+      ],
+      "build": [],
+      "test": [
+        [
+          "uv",
+          "run",
+          "pytest"
+        ]
+      ],
+      "start": [
+        "uv",
+        "run",
+        "python",
+        "-m",
+        "uvicorn",
+        "cognee.api.client:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8003"
+      ],
+      "cli": [
+        "uv",
+        "run",
+        "cognee-cli"
+      ],
+      "env": {},
+      "capabilities": [
+        "remember",
+        "recall",
+        "improve",
+        "forget",
+        "session-memory",
+        "knowledge-graph",
+        "vector-retrieval",
+        "code-retrieval",
+        "mcp",
+        "api"
+      ]
+    },
+    "browser-use": {
+      "path": "engines/browser-use",
+      "kind": "python+browser+mcp",
+      "install": [
+        [
+          "uv",
+          "sync",
+          "--all-extras",
+          "--dev"
+        ]
+      ],
+      "build": [],
+      "test": [
+        [
+          "uv",
+          "run",
+          "pytest"
+        ]
+      ],
+      "start": null,
+      "cli": [
+        "uv",
+        "run",
+        "browser-use"
+      ],
+      "env": {},
+      "capabilities": [
+        "browser-agent",
+        "navigation",
+        "click",
+        "type",
+        "forms",
+        "tabs",
+        "extraction",
+        "screenshots",
+        "sessions",
+        "profiles",
+        "mcp"
+      ]
+    },
+    "open-webui": {
+      "path": "engines/open-webui",
+      "kind": "web+backend",
+      "install": [
+        [
+          "npm",
+          "ci"
+        ],
+        [
+          "uv",
+          "sync"
+        ]
+      ],
+      "build": [
+        [
+          "npm",
+          "run",
+          "build"
+        ]
+      ],
+      "test": [
+        [
+          "npm",
+          "run",
+          "test:frontend"
+        ]
+      ],
+      "start": [
+        "uv",
+        "run",
+        "bash",
+        "backend/start.sh"
+      ],
+      "cli": [
+        "uv",
+        "run",
+        "open-webui"
+      ],
+      "env": {
+        "PORT": "8084"
+      },
+      "capabilities": [
+        "models",
+        "agents",
+        "tools",
+        "skills",
+        "rag",
+        "memory",
+        "channels",
+        "calendar",
+        "automations",
+        "voice-video",
+        "image-generation",
+        "analytics",
+        "rbac",
+        "pwa"
+      ]
+    },
+    "pageindex": {
+      "path": "engines/pageindex",
+      "kind": "python-sdk",
+      "install": [
+        [
+          "python",
+          "-m",
+          "pip",
+          "install",
+          "-e",
+          "."
+        ]
+      ],
+      "build": [],
+      "test": [
+        [
+          "pytest"
+        ]
+      ],
+      "start": null,
+      "cli": null,
+      "env": {},
+      "capabilities": [
+        "tree-index",
+        "vectorless-retrieval",
+        "reasoning-retrieval",
+        "local-chat",
+        "flash-indexing",
+        "sdk"
+      ]
+    },
+    "agent-reach": {
+      "path": "engines/agent-reach",
+      "kind": "python-cli",
+      "install": [
+        [
+          "python",
+          "-m",
+          "pip",
+          "install",
+          "-e",
+          ".[all]"
+        ]
+      ],
+      "build": [],
+      "test": [
+        [
+          "pytest"
+        ]
+      ],
+      "start": null,
+      "cli": [
+        "python",
+        "-m",
+        "agent_reach.cli"
+      ],
+      "env": {},
+      "capabilities": [
+        "web-read",
+        "web-search",
+        "twitter",
+        "reddit",
+        "linkedin",
+        "github",
+        "youtube",
+        "bilibili",
+        "rss",
+        "diagnostics",
+        "fallback-routing"
+      ]
+    },
+    "qwen-audio-agent": {
+      "path": "engines/qwen-audio-agent",
+      "kind": "node+voice+agent-runtime",
+      "install": [
+        [
+          "npm",
+          "ci"
+        ]
+      ],
+      "build": [],
+      "test": [
+        [
+          "npm",
+          "test"
+        ]
+      ],
+      "start": [
+        "node",
+        "cli/bin/qwenaudio.mjs"
+      ],
+      "cli": [
+        "node",
+        "cli/bin/qwenaudio.mjs"
+      ],
+      "env": {},
+      "capabilities": [
+        "full-duplex-voice",
+        "interruptions",
+        "background-tasks",
+        "acp",
+        "a2a",
+        "webui",
+        "tui",
+        "desktop-orb",
+        "memory",
+        "knowledge",
+        "local-speech-to-speech"
+      ]
+    }
+  }
+}

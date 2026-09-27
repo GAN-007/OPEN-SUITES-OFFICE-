@@ -15,15 +15,17 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8787
     state_db: Path = Path("state/nexus.db")
+    runtime_state_dir: Path = Path("state/runtime")
+    runtime_manifest: Path = Path("engines.runtime.json")
     artifact_dir: Path = Path("artifacts")
     execution_timeout_seconds: int = Field(default=120, ge=1, le=3600)
     require_approval_for_side_effects: bool = True
 
-    openmaic_url: str | None = None
-    weknora_url: str | None = None
-    graphiti_mcp_url: str | None = None
-    cognee_url: str | None = None
-    open_webui_url: str | None = None
+    openmaic_url: str | None = "http://127.0.0.1:3001/api"
+    weknora_url: str | None = "http://127.0.0.1:8080/api/v1"
+    graphiti_mcp_url: str | None = "http://127.0.0.1:8002/mcp/"
+    cognee_url: str | None = "http://127.0.0.1:8003"
+    open_webui_url: str | None = "http://127.0.0.1:8084/api"
     qwen_audio_url: str | None = None
 
     genoffice_command: str | None = None
@@ -31,7 +33,7 @@ class Settings(BaseSettings):
     browser_use_command: str | None = None
     qwen_audio_command: str | None = None
 
-    def command_for(self, engine: EngineName) -> list[str] | None:
+    def explicit_command_for(self, engine: EngineName) -> list[str] | None:
         raw = {
             EngineName.GENOFFICE: self.genoffice_command,
             EngineName.AGENT_REACH: self.agent_reach_command,

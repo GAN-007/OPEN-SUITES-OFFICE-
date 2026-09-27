@@ -1,273 +1,279 @@
-# Nexus Fusion Architecture
+# Nexus In-Repository Architecture
 
-Snapshot: 2026-09-27
+Snapshot: 2026-09-27  
+Architecture generation: 0.2
 
-## 1. Goal
+## 1. Objective
 
-OPEN SUITES OFFICE — Nexus is a lossless capability federation of ten independently engineered AI systems. It does not replace any upstream implementation with a simplified rewrite. Each complete upstream repository remains a Git submodule pinned to an audited 40-character commit SHA, while Nexus-owned code provides the cross-engine control plane: capability routing, identity boundaries, approvals, asset/version identity, provenance, reproducible source locking, parity gates, and deployment infrastructure.
+Nexus is a single repository and control plane containing the redistributable
+implementation source of ten specialist AI engines. The product does not reduce
+those engines to wrappers. Their native source trees remain intact under
+`engines/`; Nexus adds a common execution and governance plane above them.
 
-The governing rule is preservation plus federation:
+The design has four invariants:
 
-1. Preserve upstream implementations and native toolchains.
-2. Integrate through stable public/native surfaces such as MCP, A2A/ACP, REST, CLI and SDKs.
-3. Keep Nexus-owned code outside upstream source trees.
-4. Prove upgrades through native upstream tests and cross-engine Nexus tests.
-5. Never silently replace specialist semantics with generic adapters.
+1. **Source is local** — specialist runtime source is committed in this repo.
+2. **Native semantics survive** — native CLIs, APIs, MCP, ACP/A2A, SDKs, UIs,
+   migrations, models, and tests remain available.
+3. **Canonical ownership prevents duplication** — Nexus composes engines but
+   does not pretend their storage semantics are interchangeable.
+4. **Every imported byte is attributable** — immutable source SHAs, original
+   licenses/notices, and per-tree integrity fingerprints are retained.
 
-## 2. Audited source set
-
-| Engine | Pinned revision | Observed tracked files | Canonical Nexus role |
-| --- | --- | ---: | --- |
-| GenOffice | d9cd4895b99b3e65aa8beea13f95b232329f4c11 | 3,661 | Native Office/PDF/Markdown/HTML fidelity, CLI, MCP |
-| OpenMAIC | f2875426ae5712d26f0a76e54e9de763e86027a6 | 3,126 | Multi-agent courses, workbench, classroom, playback, exports |
-| WeKnora | 9114e4e4f905be71976a77c684d3f92731e6f9a6 | 4,604 | Enterprise RAG, Agent, Wiki, RBAC, sandbox and MCP |
-| Graphiti | 6b4b56ff6f4b1e4e69c3c3c5487cf1b8762c483a | 384 | Temporal context graph and historical facts |
-| Cognee | eb90d03740755f5252b8b12cce91fd09970f2d81 | 3,883 | Durable agent/user/project memory |
-| Browser Use | 4cbe921673b48a488f5415d9159249afd12a625b | 518 | Stateful browser execution and browser agent tooling |
-| Open WebUI | 8bd8b4fac5e059578ac0c74b3c18d11139f88b7d | 5,065 | General self-hosted AI workspace |
-| PageIndex | 037a7dbacfb9a19f38b354ce60cee5094b3f854c | 177 | Reasoning-based hierarchical long-document retrieval |
-| Agent-Reach | a19a171fa980a0785849596492e0af4db800c82f | 122 | Source-specific internet acquisition and diagnostics |
-| Qwen Audio Agent | a73bcbc2e1278bf664df38bdd169ffba1fb2451f | 1,418 | Realtime voice presence and backend task delegation |
-
-Total observed tracked files: 22,958.
-
-The authoritative machine-readable source list is `sources.lock.json`. The `.gitmodules` entries and Git tree gitlinks point to those same revisions.
-
-## 3. Architecture
+## 2. Source layout
 
 ```text
-                                   NEXUS
-                                     |
-                 +-------------------+-------------------+
-                 |                                       |
-          EXPERIENCE PLANE                         CONTROL PLANE
-                 |                                       |
-     +-----------+-----------+             +-------------+-------------+
-     |           |           |             |             |             |
- GenOffice    OpenMAIC   Open WebUI     Routing      Approvals     Provenance
-     |           |           |             |             |             |
-     +-----------+-----------+-------------+-------------+-------------+
-                                     |
-                               AGENT GATEWAY
-                                     |
-                       +-------------+-------------+
-                       |             |             |
-                      MCP           A2A           ACP
-                       |             |             |
-             +---------+-------------+-------------+---------+
-             |                                             |
-       CAPABILITY BROKERS                               EVENT/WORKFLOW
-             |                                             |
-   +---------+----------+----------+----------+             |
-   |         |          |          |          |             |
- Office   Classroom  Knowledge   Memory    Browser/Web      |
-   |         |          |          |          |             |
- GenOffice OpenMAIC  WeKnora   Graphiti   Browser Use       |
-                              Cognee       Agent-Reach      |
-                                                           |
-                    RETRIEVAL BROKER <---------------------+
-                        |
-              +---------+---------+
-              |         |         |
-          PageIndex   WeKnora   Graphiti
-                                  |
-                                Cognee
+OPEN-SUITES-OFFICE-
+├── nexus_workspace/         # Nexus-owned control plane
+├── engines/
+│   ├── genoffice/           # vendored open/core source
+│   ├── openmaic/
+│   ├── weknora/
+│   ├── graphiti/
+│   ├── cognee/
+│   ├── browser-use/
+│   ├── open-webui/
+│   ├── pageindex/
+│   ├── agent-reach/
+│   ├── qwen-audio-agent/
+│   └── VENDOR_MANIFEST.json
+├── config/
+├── policies/
+├── schemas/
+├── infra/
+├── scripts/
+├── tests/
+├── sources.lock.json
+└── engines.runtime.json
 ```
 
-Nexus is a capability federation, not a flattened fork. MCP is the tool plane. A2A and ACP are agent interoperability planes. Durable workflow state belongs to the Nexus control plane or the owning upstream engine; LangGraph is retained where an upstream uses graph-style reasoning but is not treated as the distributed system database.
+The former `upstream/*` gitlinks and `.gitmodules` are removed by the
+vendorization transition and CI rejects their reintroduction.
 
-## 4. Canonical ownership
+## 3. Product topology
 
-Nexus avoids duplicated intelligence by assigning one canonical owner to each information or operation class.
+```text
+                              NEXUS
+                                |
+                +---------------+---------------+
+                |                               |
+          EXPERIENCE PLANE                CONTROL PLANE
+                |                               |
+       +--------+--------+             +--------+--------+
+       |        |        |             |        |        |
+   GenOffice OpenMAIC Open WebUI    Router   Policy  Provenance
+       |        |        |             |        |        |
+       +--------+--------+-------------+--------+--------+
+                                |
+                         RUNTIME CATALOG
+                                |
+           +--------------------+--------------------+
+           |                    |                    |
+          CLI/API              MCP               ACP/A2A
+           |                    |                    |
+  +--------+-------+       +----+-----+        +-----+------+
+  |        |       |       |          |        |            |
+Office  Browser  Reach   Graphiti  WeKnora   Qwen Audio  Agents
+  |        |       |       |          |        |
+  +--------+-------+-------+----------+--------+
+                   |
+            RETRIEVAL / MEMORY
+        +----------+----------+----------+
+        |          |          |          |
+    PageIndex   WeKnora    Graphiti    Cognee
+```
 
-| Information / operation | Canonical owner |
-| --- | --- |
-| DOCX/XLSX/PPTX and Office-format fidelity | GenOffice |
-| PDF native editing/conversion | GenOffice |
-| Course/classroom generation and state | OpenMAIC |
-| Enterprise knowledge base and Wiki | WeKnora |
-| Long-document structural retrieval | PageIndex |
-| Time-varying facts and historical validity | Graphiti |
-| Durable agent/user/project memory | Cognee |
-| Interactive browser state/actions | Browser Use |
-| Source-specific web acquisition | Agent-Reach |
-| General model/chat workspace | Open WebUI |
-| Realtime voice/task presence | Qwen Audio Agent |
-| Cross-engine routing/workflow/audit | Nexus |
-| Asset identity and immutable versions | Nexus Asset Store |
+## 4. Runtime catalog
 
-The same document is not blindly copied to every retrieval and memory system. Nexus stores an original asset once, records immutable versions, and sends references or purpose-specific derived indexes only to engines that need them.
+`engines.runtime.json` is the machine-readable bridge from the Nexus control
+plane to the native implementation trees. For every engine it defines:
 
-## 5. Protocol boundaries
+- vendored source root;
+- runtime kind;
+- native install commands;
+- native build commands;
+- native test commands;
+- native long-running start command where applicable;
+- native CLI command where applicable;
+- non-conflicting Nexus environment overrides;
+- capability inventory.
 
-### MCP
+`RuntimeCatalog` resolves those entries; `NativeProcessManager` runs lifecycle
+and parity phases from the actual engine directory and records PID/log state.
 
-MCP is used for discoverable tool invocation where an upstream exposes MCP. The Nexus MCP HTTP adapter supports JSON-RPC and Streamable HTTP/SSE responses. MCP is not used as the durable event store.
+Default local service ports are deliberately separated:
 
-### A2A and ACP
+| Service | Nexus local port |
+|---|---:|
+| OpenMAIC | 3001 |
+| WeKnora | 8080 |
+| Graphiti MCP | 8002 |
+| Cognee API | 8003 |
+| Open WebUI | 8084 |
+| Nexus control plane | 8787 |
 
-Qwen Audio Agent's current architecture supports a unified client runtime and ACP/A2A backend integration. Nexus therefore treats ACP/A2A as agent-to-agent interoperability protocols rather than its internal database.
+Qwen Audio normally owns its own local gateway/runtime. CLI engines do not need a
+persistent port.
 
-### REST/HTTP
+## 5. Native integration surfaces
 
-WeKnora, Cognee, Open WebUI, OpenMAIC and other services can be connected through native HTTP APIs. The generic JSON adapter preserves method/path/arguments rather than inventing simplified business semantics.
+### GenOffice
 
-### CLI
+Nexus invokes the vendored GenOffice CLI from
+`engines/genoffice/packages/cli/bin/genoffice`. The same source tree retains
+Docs, Sheets, Slides, PDF, Markdown, HTML applications, document engines,
+render/conversion pipelines, agent-core, skills and MCP support.
 
-GenOffice, Browser Use, Agent-Reach and Qwen-related command surfaces can be invoked using the CLI adapter when their native CLI is the appropriate surface. CLI execution is time bounded and captures exact argv/output for provenance.
+### OpenMAIC
 
-### SDK
+The complete Next.js/TypeScript workspace remains present. Nexus can run the
+native service and route classroom/course work to it without replacing its
+generation, orchestration, workbench, playback, quiz, PBL, whiteboard, material,
+export, or skill implementation.
 
-PageIndex local mode is invoked through its native Python SDK so local vectorless retrieval does not require a cloud MCP dependency.
+### WeKnora
 
-## 6. Control-plane implementation
+The Go backend, frontend, document reader, CLI, migrations, MCP server, sandbox
+and enterprise knowledge logic remain in-tree. Nexus addresses its native API
+rather than reimplementing WeKnora's knowledge-base semantics.
 
-The `nexus_workspace` package is executable, not a structural placeholder.
+### Graphiti
 
-- `models.py`: typed capabilities, engine identities, risk classes and API contracts.
-- `routing.py`: deterministic specialist ownership and explicit override support.
-- `config.py`: environment-backed endpoints/commands and runtime settings.
-- `database.py`: persistent provenance and asset metadata.
-- `assets.py`: immutable SHA-256-addressed asset versions.
-- `service.py`: execution orchestration, approval enforcement and provenance writes.
-- `api.py`: FastAPI control-plane endpoints.
-- `cli.py`: runnable Nexus CLI and API server.
-- `adapters/*`: HTTP, CLI, MCP and PageIndex SDK transports.
+The Python core and MCP server are in-tree. Nexus uses the MCP plane for
+temporal episode/entity/fact operations while Graphiti remains authoritative for
+temporal validity and graph semantics.
 
-The current API exposes health, engine status, routing, execution, immutable asset creation and provenance retrieval. OpenAPI documentation is produced by FastAPI.
+### Cognee
 
-## 7. Side-effect policy
+Cognee's Python memory engine, API, MCP, frontend and evaluation code remain
+in-tree. Durable remember/recall/improve/forget semantics stay owned by Cognee.
 
-Read-only reasoning and local artifact writes are distinct from externally observable actions. Requests marked `external_side_effect` are rejected unless `approved=true` when approval enforcement is enabled.
+### Browser Use
 
-Examples include submitting browser forms, sending external messages, purchasing, publishing content, deleting remote resources or other changes outside the local Nexus workspace.
+Browser agent/runtime code, tools, MCP, profiles, extraction and test suites are
+in-tree. Nexus invokes the native CLI/runtime from that source.
 
-Upstream engines may have stricter approval mechanisms; Nexus never weakens them.
+### Open WebUI
 
-## 8. Asset and provenance model
+Frontend and backend code are in-tree under the Open WebUI License. Its branding
+is preserved. Nexus can use it as the general AI workspace while retaining its
+models, agents, RAG, tools, skills, memory, channels, scheduling, media and RBAC
+surfaces.
 
-Every ingested or generated artifact receives:
+### PageIndex
 
-- stable asset ID,
-- immutable version ID,
-- monotonically increasing version,
-- SHA-256 content digest,
-- content length,
-- media type,
-- persisted byte path,
-- actor and timestamp.
+Nexus imports the local vendored SDK path directly, keeping vectorless tree
+indexing and reasoning retrieval local to the repository.
 
-Every executed cross-engine action receives:
+### Agent-Reach
 
-- execution ID,
-- provenance ID,
-- actor,
-- selected engine and capability,
-- action,
-- normalized request,
-- normalized result,
-- timestamp.
+The complete channel/router/diagnostic implementation is vendored and its native
+CLI is invoked from the in-tree source.
 
-This makes work reconstructable without pretending that one engine's internal trace format is identical to another's.
+### Qwen Audio Agent
 
-## 9. Retrieval routing
+Gateway, server, CLI, web, TUI, desktop, mobile, ACP/A2A adapters, memory and
+knowledge code are in-tree. Nexus invokes the vendored CLI/gateway.
 
-Examples:
+## 6. Routing versus implementation
 
-- Historical/temporal questions route to Graphiti.
-- Long document section/appendix/page reasoning routes to PageIndex.
-- Enterprise KB/Wiki queries route to WeKnora.
-- Durable memory/previous-session questions route to Cognee.
-- Office creation/editing routes to GenOffice.
-- Stateful navigation/click/type/form tasks route to Browser Use.
-- Platform-specific internet research routes to Agent-Reach.
-- Course/classroom tasks route to OpenMAIC.
-- Realtime voice tasks route to Qwen Audio Agent.
-- General model/chat requests with no specialist signal route to Open WebUI.
+Routing is not the implementation. It merely selects which **local implementation**
+owns a request. For example:
 
-Mixed workflows may call several owners sequentially, while each retains authority for its own data semantics.
+- a DOCX edit routes to the GenOffice code physically under `engines/genoffice`;
+- a historical fact query routes to the local Graphiti MCP runtime;
+- a memory recall routes to the local Cognee API/runtime;
+- a browser form task routes to local Browser Use code;
+- a 900-page structural query executes through the vendored PageIndex SDK;
+- source-specific web acquisition executes through vendored Agent-Reach;
+- a voice task executes through vendored Qwen Audio Agent.
 
-## 10. Infrastructure
+This is the key architectural change from the prior submodule federation.
 
-`infra/docker-compose.yml` supplies local development instances of PostgreSQL, Redis, FalkorDB, Qdrant and MinIO. These are infrastructure dependencies, not replacements for the ten applications.
+## 7. Source integrity
 
-Production deployment must add TLS, managed secrets, network policy, SSO/RBAC, immutable image digests, backups, sandbox isolation, rate controls and observability.
+`scripts/vendor_sources.py` materializes each audited source SHA into
+`engines/`, including nested submodule content. It strips only Git metadata and
+explicitly excluded paths.
 
-## 11. Reproducibility and source verification
+`engines/VENDOR_MANIFEST.json` records for every engine:
 
-`scripts/verify_lock.py` validates exactly ten unique HTTPS GitHub repositories, safe paths and full SHAs.
+- source repository;
+- source commit;
+- vendored path;
+- exclusions/restrictions;
+- file count;
+- total byte count;
+- aggregate SHA-256;
+- largest source files.
 
-`scripts/verify_submodules.py` confirms that initialized submodules are at the exact locked revisions.
+`scripts/verify_vendored.py` recomputes that state in CI.
 
-`scripts/bootstrap_sources.py` can independently materialize the same pinned trees and refuses dirty checkouts.
+`scripts/verify_engine_contracts.py` separately proves that the major
+capability-bearing directories are present. This catches a tree that might be
+internally consistent but accidentally incomplete.
 
-`scripts/audit_sources.py` inventories tracked files, extensions, top-level structure, code markers and license/notice files.
+## 8. Licensing boundary
 
-The Git submodules are the primary source-preservation mechanism. The bootstrap/audit utilities provide an independent reproducibility and inspection path.
+All ten engines retain their upstream terms.
 
-## 12. Native parity gates
+GenOffice core can be vendored under Apache-2.0. GenOffice `ee/` cannot be
+publicly redistributed under its current enterprise license without an
+appropriate agreement, so it is excluded and treated as an optional licensed
+extension boundary.
 
-`upstream-tests.json` records native install/build/test entry points for all ten engines. The manual `Upstream Parity Gates` GitHub Actions workflow checks out the complete submodule graph, verifies SHAs and can execute install/build/test phases for each engine independently.
+Open WebUI remains branded and governed by the Open WebUI License.
 
-Nexus does not replace upstream tests with mocks. Nexus-owned tests cover the integration layer while upstream-native test suites cover upstream behavior.
+No root Nexus license overrides an engine's own license.
 
-Required parity areas include:
+## 9. Native parity
 
-- GenOffice: Office round-trip fidelity, render checks, CLI and MCP.
-- OpenMAIC: generation/workbench, durable sessions, materials, classroom scenes, quizzes/PBL/whiteboard and exports.
-- WeKnora: RAG/Agent/Wiki, workspace RBAC/audit, MCP, sandbox/browser/skills and source citations.
-- Graphiti: episode ingestion, temporal validity, search, graph drivers and MCP.
-- Cognee: remember/recall/improve/forget, session promotion, retrieval routes, permissions and MCP.
-- Browser Use: local/cloud browser paths, browser state/actions, extraction, sessions and tool surfaces.
-- Open WebUI: models, tools, skills, RAG, channels, authentication and native migrations.
-- PageIndex: local tree indexing/retrieval/chat and source locators.
-- Agent-Reach: doctor diagnostics, channel health, preferred/fallback routing and credential boundaries.
-- Qwen Audio Agent: full-duplex conversation, interruption, background task lifecycle, ACP/A2A adapters and native UIs.
+Nexus-owned tests prove the integration plane. Native engine tests prove the
+specialist engines.
 
-## 13. Cross-engine acceptance scenarios
+The parity matrix runs each engine's own install/build/test commands from
+`engines/<name>`. The goal is not “a wrapper can reach a URL”; it is “the
+native source present in this repository still builds and its own tests still
+pass.”
 
-1. Upload a long PDF; create a PageIndex tree and WeKnora KB representation; promote selected temporal facts to Graphiti and approved durable memory to Cognee; answer with evidence traceable to the source asset.
-2. Open a DOCX; obtain external research through Agent-Reach; apply a native GenOffice edit to a new immutable asset version while retaining the original.
-3. Ask by voice for a multi-step web task; Qwen delegates through Nexus; Agent-Reach handles optimized read/search; Browser Use performs stateful interaction; approval is required before the committing external action.
-4. Build an OpenMAIC course from uploaded files and web materials, personalize from approved Cognee memory, export PPTX, then revise the deck in GenOffice.
-5. Ask a question whose factual answer changed over time and verify Graphiti returns historical validity instead of only current state.
-6. Delete durable memory and verify Cognee-derived references/tombstones are handled without deleting unrelated WeKnora enterprise KB content.
-7. Use Open WebUI alongside Nexus specialist surfaces while preserving identity/resource authorization and Open WebUI's license/branding obligations.
+## 10. Cross-engine acceptance scenarios
 
-## 14. Security boundaries
+A release candidate is expected to prove at least these compositions:
 
-- No secrets are committed to source locks, gitmodules or provenance payloads.
-- Browser credentials/cookies stay inside their owning runtime boundary.
-- MCP endpoints should be allowlisted and identity bound in production.
-- URL-fetching services require SSRF controls.
-- File execution and active document content must be sandboxed/quarantined according to policy.
-- External side effects require explicit approval.
-- Tenant IDs must scope graph, vector, object and relational data.
-- Native upstream security controls remain authoritative and are never bypassed by Nexus.
+1. **Document → retrieval → knowledge → memory**: store a PDF asset, index with
+   PageIndex, register enterprise knowledge in WeKnora, promote time-sensitive
+   facts to Graphiti and durable conclusions to Cognee, then answer with
+   provenance.
+2. **Research → Office edit**: acquire source material through Agent-Reach,
+   perform stateful browser work where required with Browser Use, and create a
+   new GenOffice document version without destroying the original.
+3. **Voice → delegated task**: Qwen Audio maintains the live conversation while
+   Nexus delegates specialist work and returns the result to the same task
+   context.
+4. **Topic → classroom → PPTX → Office revision**: OpenMAIC builds the classroom
+   and export; GenOffice performs native deck revision.
+5. **Temporal recall**: Graphiti distinguishes what was true before and after a
+   fact change.
+6. **Memory lifecycle**: Cognee forget operations do not destroy unrelated
+   WeKnora enterprise knowledge.
+7. **General workspace**: Open WebUI remains usable as the broad model/tool
+   surface while specialists remain available through Nexus.
 
-## 15. Licensing boundaries
+## 11. Definition of complete
 
-The root Apache-2.0 license applies only to Nexus-owned integration code. Every submodule remains governed by its upstream license, notices, trademarks and third-party terms.
+For the public repository, “complete in-house” means:
 
-In particular, the pinned Open WebUI code uses its current Open WebUI License with branding-preservation requirements, and GenOffice contains an `ee/` area under separate enterprise terms. Nexus keeps these boundaries visible rather than relicensing or silently rebadging upstream code.
+- all redistributable source of the ten pinned engines is physically tracked
+  under `engines/`;
+- no runtime submodule fetch is required;
+- excluded/restricted code is explicitly identified rather than silently
+  copied;
+- each engine's principal capability roots exist;
+- Nexus can enumerate and address all ten local runtimes;
+- native install/build/test commands are retained;
+- Nexus integration tests pass;
+- source-tree integrity passes;
+- licenses/notices remain attached to their original code;
+- cross-engine actions remain policy- and provenance-aware.
 
-## 16. Upgrade procedure
-
-A source upgrade is controlled:
-
-1. Change one candidate upstream SHA.
-2. Verify/re-audit the source.
-3. Run the engine's native install/build/test gate.
-4. Run Nexus adapter contract tests.
-5. Run affected cross-engine scenarios.
-6. Review schema/data migration changes.
-7. Review license/notice delta.
-8. Promote the lock and submodule gitlink only after required gates pass.
-
-No automated job may silently move pinned upstream revisions in production.
-
-## 17. Definition of done
-
-Nexus is considered lossless only when all ten exact source trees are materializable, required native parity gates pass, specialist capabilities remain available, cross-engine scenarios pass, external side effects are policy checked, artifacts remain versioned and traceable, retrieval provides evidence, durable workflow state survives restart where applicable, upgrade changes are reproducible, and license/trademark boundaries remain intact.
-
-Anything less is an integration subset rather than the full lossless federation.
+That is a monorepo implementation, not a list of remote integrations.

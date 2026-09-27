@@ -1,12 +1,29 @@
 OPEN SUITES OFFICE — Nexus
 Copyright 2026 GAN-007
 
-This repository federates independently licensed upstream projects through Git
-submodules. No upstream copyright or trademark ownership is claimed here.
-Review each upstream project's LICENSE, NOTICE, third-party notices and branding
-terms before redistribution.
+Nexus-owned integration code is licensed under the root Apache License 2.0.
 
-Open WebUI currently has branding-preservation requirements in its upstream
-license. GenOffice's upstream repository also contains an ee/ directory with a
-separate enterprise license. Nexus keeps these boundaries intact by pinning the
-complete repositories as independent submodules rather than relicensing them.
+The repository also contains vendored source code from independent projects in
+engines/. Those source trees retain their original copyright notices, licenses,
+NOTICE files, third-party notices, trademarks, and attribution obligations.
+Vendoring does not transfer ownership and does not relicense upstream code.
+
+Pinned source provenance is recorded in sources.lock.json and
+engines/VENDOR_MANIFEST.json.
+
+Important license boundaries:
+
+1. GenOffice core is Apache-2.0, but the upstream GenOffice ee/ directory is
+   governed by the GenOffice Enterprise License. That directory is deliberately
+   excluded from the public vendored tree because its license does not permit
+   public redistribution without an appropriate enterprise agreement.
+
+2. Open WebUI is redistributed under the Open WebUI License. Its current
+   license includes branding-preservation requirements. Nexus does not remove,
+   obscure, or replace Open WebUI branding in the vendored source.
+
+3. WeKnora and other engines include third-party components and notice files.
+   Those files are retained inside their vendored trees and remain authoritative.
+
+Before distributing a modified build, review the license and notice files in
+the affected engines/ directory in addition to this root NOTICE.

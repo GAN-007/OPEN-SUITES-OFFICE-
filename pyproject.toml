@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "open-suites-office-nexus"
-version = "0.1.0"
-description = "Lossless capability federation for GenOffice, OpenMAIC, WeKnora, Graphiti, Cognee, Browser Use, Open WebUI, PageIndex, Agent-Reach and Qwen Audio Agent."
+version = "0.2.0"
+description = "In-repository unified AI workspace integrating ten vendored specialist engines through one Nexus control plane."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }

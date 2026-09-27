@@ -1,22 +1,27 @@
 PYTHON ?= python3
 
-.PHONY: verify-lock verify-submodules bootstrap audit test lint serve infra-up infra-down upstream-test
+.PHONY: verify-lock verify-vendored bootstrap vendor audit test lint serve infra-up infra-down engine-test engine-build engine-install
 
 verify-lock:
 	$(PYTHON) scripts/verify_lock.py
 
-verify-submodules: verify-lock
-	$(PYTHON) scripts/verify_submodules.py
+verify-vendored: verify-lock
+	$(PYTHON) scripts/verify_vendored.py --require
+	$(PYTHON) scripts/verify_engine_contracts.py
 
-bootstrap: verify-lock
-	git submodule sync --recursive
-	git submodule update --init --recursive
-	$(PYTHON) scripts/verify_submodules.py
+vendor: verify-lock
+	$(PYTHON) scripts/vendor_sources.py
+	git add -A
+	$(PYTHON) scripts/verify_vendored.py --require
+	$(PYTHON) scripts/verify_engine_contracts.py
 
-audit: verify-submodules
+bootstrap: vendor
+
+audit: verify-vendored
 	$(PYTHON) scripts/audit_sources.py
 
 test: verify-lock
+	$(PYTHON) -m compileall -q nexus_workspace scripts tests
 	pytest
 
 lint:
@@ -31,5 +36,11 @@ infra-up:
 infra-down:
 	docker compose -f infra/docker-compose.yml down
 
-upstream-test:
+engine-install:
+	$(PYTHON) scripts/engine_tasks.py install
+
+engine-build:
+	$(PYTHON) scripts/engine_tasks.py build
+
+engine-test:
 	$(PYTHON) scripts/engine_tasks.py test
