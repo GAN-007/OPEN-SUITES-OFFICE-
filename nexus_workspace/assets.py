@@ -25,7 +25,7 @@ class AssetStore:
         digest = hashlib.sha256(content).hexdigest()
         directory = self.root / asset_id
         directory.mkdir(parents=True, exist_ok=True)
-        path = directory / f"v{version}-{edigest[:16]}"
+        path = directory / f"v{version}-{digest[:16]}"
         path.write_bytes(content)
         row = self.db.add_asset_version(
             asset_id=asset_id,
