@@ -1,0 +1,960 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-27",
+  "storage_model": "vendored-source-tree",
+  "engine_count": 10,
+  "engines": [
+    {
+      "name": "genoffice",
+      "source_repository": "https://github.com/genspark-ai/genoffice.git",
+      "source_commit": "d9cd4895b99b3e65aa8beea13f95b232329f4c11",
+      "vendored_path": "engines/genoffice",
+      "license": "Apache-2.0 core; ee/ is GenOffice Enterprise License",
+      "excluded_paths": [
+        "ee"
+      ],
+      "restriction": "ee/ may be used/copied only for development/testing; public redistribution requires a Mainfunc enterprise agreement.",
+      "nested_submodules_materialized": false,
+      "file_count": 3659,
+      "total_bytes": 64625175,
+      "aggregate_sha256": "3c545dc16a4419bc785c7596e5db8f2b53edf5d917a27454f5f57c04f22e4097",
+      "largest_files": [
+        {
+          "path": "apps/docs/src/renderer/fonts/NotoSerifCJKsc-Regular-subset.woff2",
+          "bytes": 3495928
+        },
+        {
+          "path": "apps/docs/src/renderer/fonts/NotoSansCJKsc-Regular-subset.woff2",
+          "bytes": 2533160
+        },
+        {
+          "path": "docs/assets/readme/mcp-deck-motion.webp",
+          "bytes": 1076846
+        },
+        {
+          "path": "packages/ui/src/fonts/Carlito-BoldItalic.ttf",
+          "bytes": 812344
+        },
+        {
+          "path": "packages/ui/src/fonts/Carlito-Bold.ttf",
+          "bytes": 686240
+        },
+        {
+          "path": "packages/ui/src/fonts/Carlito-Regular.ttf",
+          "bytes": 631712
+        },
+        {
+          "path": "packages/ui/src/fonts/Carlito-Italic.ttf",
+          "bytes": 619052
+        },
+        {
+          "path": "package-lock.json",
+          "bytes": 576056
+        },
+        {
+          "path": "docs/assets/readme/search-jev-motion.webp",
+          "bytes": 519398
+        },
+        {
+          "path": "apps/docs/src/renderer/fonts/GenOfficeSerifKR-Regular-subset.woff2",
+          "bytes": 512436
+        },
+        {
+          "path": "packages/file-parse/tests/fixtures/legacy-sample.ppt",
+          "bytes": 461824
+        },
+        {
+          "path": "apps/shell/src/renderer/src/strings.ts",
+          "bytes": 460055
+        },
+        {
+          "path": "apps/docs/src/renderer/fonts/LiberationSans-Italic.ttf",
+          "bytes": 415816
+        },
+        {
+          "path": "apps/docs/src/renderer/fonts/LiberationSans-Bold.ttf",
+          "bytes": 414456
+        },
+        {
+          "path": "apps/docs/src/renderer/fonts/LiberationSans-Regular.ttf",
+          "bytes": 410712
+        },
+        {
+          "path": "apps/docs/src/renderer/fonts/LiberationSans-BoldItalic.ttf",
+          "bytes": 408996
+        },
+        {
+          "path": "apps/docs/src/renderer/fonts/LiberationSerif-Regular.ttf",
+          "bytes": 393576
+        },
+        {
+          "path": "apps/pdf/src/renderer/App.tsx",
+          "bytes": 388297
+        },
+        {
+          "path": "apps/docs/src/renderer/fonts/LiberationSerif-BoldItalic.ttf",
+          "bytes": 376772
+        },
+        {
+          "path": "apps/docs/src/renderer/fonts/LiberationSerif-Italic.ttf",
+          "bytes": 375632
+        }
+      ]
+    },
+    {
+      "name": "openmaic",
+      "source_repository": "https://github.com/THU-MAIC/OpenMAIC.git",
+      "source_commit": "f2875426ae5712d26f0a76e54e9de763e86027a6",
+      "vendored_path": "engines/openmaic",
+      "license": "MIT",
+      "excluded_paths": [],
+      "restriction": null,
+      "nested_submodules_materialized": false,
+      "file_count": 3126,
+      "total_bytes": 118986599,
+      "aggregate_sha256": "13b7b2186b4c1e649d791a139ff801c6da92d1be0fdb9cdf0a532b952035b910",
+      "largest_files": [
+        {
+          "path": "assets/openclaw-feishu-demo.gif",
+          "bytes": 18925456
+        },
+        {
+          "path": "assets/python.gif",
+          "bytes": 14904435
+        },
+        {
+          "path": "assets/avalon.gif",
+          "bytes": 11277654
+        },
+        {
+          "path": "assets/deepseek.gif",
+          "bytes": 9602566
+        },
+        {
+          "path": "assets/zhipu-minimax.gif",
+          "bytes": 7404692
+        },
+        {
+          "path": "assets/interactive_mode/game_interactive.gif",
+          "bytes": 3231751
+        },
+        {
+          "path": "assets/interactive_mode/teacher_action_interative.gif",
+          "bytes": 2399365
+        },
+        {
+          "path": "assets/discussion.gif",
+          "bytes": 2390756
+        },
+        {
+          "path": "assets/quiz.gif",
+          "bytes": 2262695
+        },
+        {
+          "path": "assets/interactive_mode/3D_interactive.gif",
+          "bytes": 1982227
+        },
+        {
+          "path": "assets/interactive_mode/code_interactive.gif",
+          "bytes": 1870783
+        },
+        {
+          "path": "assets/interactive_mode/ipad_interactive.png",
+          "bytes": 1767381
+        },
+        {
+          "path": "assets/interactive_mode/desktop_interactive.png",
+          "bytes": 1545686
+        },
+        {
+          "path": "assets/interactive.gif",
+          "bytes": 1330217
+        },
+        {
+          "path": "public/vendor/video-export/fonts/noto-sans-sc-chinese-simplified-400-normal.woff2",
+          "bytes": 1142552
+        },
+        {
+          "path": "assets/pbl.gif",
+          "bytes": 1064282
+        },
+        {
+          "path": "public/avatars/teacher.png",
+          "bytes": 1045093
+        },
+        {
+          "path": "assets/interactive_mode/simulation_interactive.gif",
+          "bytes": 998416
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "bytes": 960257
+        },
+        {
+          "path": "assets/interactive_mode/phone_interactive.png",
+          "bytes": 919467
+        }
+      ]
+    },
+    {
+      "name": "weknora",
+      "source_repository": "https://github.com/Tencent/WeKnora.git",
+      "source_commit": "9114e4e4f905be71976a77c684d3f92731e6f9a6",
+      "vendored_path": "engines/weknora",
+      "license": "MIT core with third-party notices",
+      "excluded_paths": [],
+      "restriction": null,
+      "nested_submodules_materialized": false,
+      "file_count": 4604,
+      "total_bytes": 103895438,
+      "aggregate_sha256": "bcaff2469027b08c6991b7fe11791d73f62e7a66cd7cd823ae5d128ff55c3810",
+      "largest_files": [
+        {
+          "path": "website-docs/public/screenshots/quickstart-register.png",
+          "bytes": 5033943
+        },
+        {
+          "path": "website-docs/public/screenshots/sandbox-desktop.png",
+          "bytes": 2198836
+        },
+        {
+          "path": "website-docs/homepage/public/docs/_home/product/sandbox-desktop.png",
+          "bytes": 2198836
+        },
+        {
+          "path": "website-docs/public/screenshots/chat-save-answer-editor.png",
+          "bytes": 1152007
+        },
+        {
+          "path": "website-docs/public/screenshots/wiki-graph.png",
+          "bytes": 1139913
+        },
+        {
+          "path": "website-docs/homepage/public/docs/_home/product/wiki-graph.png",
+          "bytes": 1139913
+        },
+        {
+          "path": "docs/images/wiki-graph.png",
+          "bytes": 1139913
+        },
+        {
+          "path": "website-docs/public/screenshots/observability-langfuse.png",
+          "bytes": 1053326
+        },
+        {
+          "path": "docs/images/langfuse.png",
+          "bytes": 1053326
+        },
+        {
+          "path": "docs/docs.go",
+          "bytes": 998357
+        },
+        {
+          "path": "docs/swagger.json",
+          "bytes": 997374
+        },
+        {
+          "path": "frontend/public/tdesign-icons/0.4.1/fonts/index.js",
+          "bytes": 976443
+        },
+        {
+          "path": "website-docs/public/screenshots/chat-references-drawer.png",
+          "bytes": 922242
+        },
+        {
+          "path": "website-docs/public/screenshots/skill-sandbox-chat.png",
+          "bytes": 909057
+        },
+        {
+          "path": "website-docs/homepage/public/docs/_home/product/skill-sandbox-chat.png",
+          "bytes": 909057
+        },
+        {
+          "path": "docs/images/skill-sandbox-chat.png",
+          "bytes": 909057
+        },
+        {
+          "path": "docs/images/answer.png",
+          "bytes": 853609
+        },
+        {
+          "path": "docs/images/graph1.png",
+          "bytes": 835658
+        },
+        {
+          "path": "website-docs/public/screenshots/chrome-extension.png",
+          "bytes": 825558
+        },
+        {
+          "path": "website-docs/public/screenshots/integration-cli.png",
+          "bytes": 781081
+        }
+      ]
+    },
+    {
+      "name": "graphiti",
+      "source_repository": "https://github.com/getzep/graphiti.git",
+      "source_commit": "6b4b56ff6f4b1e4e69c3c3c5487cf1b8762c483a",
+      "vendored_path": "engines/graphiti",
+      "license": "Apache-2.0",
+      "excluded_paths": [],
+      "restriction": null,
+      "nested_submodules_materialized": false,
+      "file_count": 384,
+      "total_bytes": 22547053,
+      "aggregate_sha256": "1f3e046f0c81f18b5ce17b9e8800cddd501ea190bd35b19c34f8cf899e8ca94d",
+      "largest_files": [
+        {
+          "path": "tests/evals/data/longmemeval_data/longmemeval_oracle.json",
+          "bytes": 15388478
+        },
+        {
+          "path": "uv.lock",
+          "bytes": 1005857
+        },
+        {
+          "path": "images/graphiti-intro-slides-stock-2.gif",
+          "bytes": 756899
+        },
+        {
+          "path": "mcp_server/uv.lock",
+          "bytes": 727159
+        },
+        {
+          "path": "images/arxiv-screenshot.png",
+          "bytes": 535574
+        },
+        {
+          "path": "examples/ecommerce/runner.ipynb",
+          "bytes": 337182
+        },
+        {
+          "path": "examples/langgraph-agent/tinybirds-jess.png",
+          "bytes": 246122
+        },
+        {
+          "path": "server/uv.lock",
+          "bytes": 227478
+        },
+        {
+          "path": "examples/wizard_of_oz/woo.txt",
+          "bytes": 210358
+        },
+        {
+          "path": "images/graphiti-graph-intro.gif",
+          "bytes": 173365
+        },
+        {
+          "path": "examples/opentelemetry/uv.lock",
+          "bytes": 144442
+        },
+        {
+          "path": "graphiti_core/graphiti.py",
+          "bytes": 74701
+        },
+        {
+          "path": "graphiti_core/search/search_utils.py",
+          "bytes": 74129
+        },
+        {
+          "path": "tests/test_graphiti_mock.py",
+          "bytes": 64921
+        },
+        {
+          "path": "mcp_server/src/graphiti_mcp_server.py",
+          "bytes": 56385
+        },
+        {
+          "path": "examples/podcast/podcast_transcript.txt",
+          "bytes": 43632
+        },
+        {
+          "path": "examples/data/manybirds_products.json",
+          "bytes": 41947
+        },
+        {
+          "path": "signatures/version1/cla.json",
+          "bytes": 41659
+        },
+        {
+          "path": "graphiti_core/nodes.py",
+          "bytes": 38014
+        },
+        {
+          "path": "graphiti_core/utils/maintenance/node_operations.py",
+          "bytes": 37809
+        }
+      ]
+    },
+    {
+      "name": "cognee",
+      "source_repository": "https://github.com/topoteretes/cognee.git",
+      "source_commit": "eb90d03740755f5252b8b12cce91fd09970f2d81",
+      "vendored_path": "engines/cognee",
+      "license": "Apache-2.0",
+      "excluded_paths": [],
+      "restriction": null,
+      "nested_submodules_materialized": false,
+      "file_count": 3883,
+      "total_bytes": 100323546,
+      "aggregate_sha256": "a6509817164f812de2fad713fc265deca7189d4547244cfb9e8e9069552fd7b3",
+      "largest_files": [
+        {
+          "path": "cognee-frontend/public/videos/cognee-graph.mov",
+          "bytes": 7825652
+        },
+        {
+          "path": "cognee-frontend/public/videos/full-demo.mp4",
+          "bytes": 7690455
+        },
+        {
+          "path": "assets/cognee_demo.gif",
+          "bytes": 4394373
+        },
+        {
+          "path": "cognee-frontend/public/videos/rotating-logo-background.mp4",
+          "bytes": 4284902
+        },
+        {
+          "path": "assets/cognee_products.png",
+          "bytes": 3994726
+        },
+        {
+          "path": "cognee-frontend/public/videos/mascot-waiting.mp4",
+          "bytes": 3465799
+        },
+        {
+          "path": "cognee-frontend/public/videos/mascot-excited.mp4",
+          "bytes": 3465799
+        },
+        {
+          "path": "assets/cognee-demo.gif",
+          "bytes": 3351729
+        },
+        {
+          "path": "notebooks/cognee_demo.ipynb",
+          "bytes": 2621162
+        },
+        {
+          "path": "uv.lock",
+          "bytes": 2392714
+        },
+        {
+          "path": "cognee-frontend/public/videos/mascot-purple-glow.mp4",
+          "bytes": 2323396
+        },
+        {
+          "path": "cognee-frontend/public/videos/mascot-wink.mp4",
+          "bytes": 2174327
+        },
+        {
+          "path": "cognee-frontend/public/videos/cognee-mascot-wave.mp4",
+          "bytes": 1699719
+        },
+        {
+          "path": "cognee-frontend/public/visuals/usecase-memory-agents.svg",
+          "bytes": 1587410
+        },
+        {
+          "path": "cognee-frontend/public/visuals/usecase-sales.svg",
+          "bytes": 1582886
+        },
+        {
+          "path": "cognee-frontend/public/visuals/usecase-docs.svg",
+          "bytes": 1579052
+        },
+        {
+          "path": "cognee-frontend/public/visuals/usecase-investment.svg",
+          "bytes": 1575635
+        },
+        {
+          "path": "cognee-frontend/public/visuals/usecase-second-brain.svg",
+          "bytes": 1575293
+        },
+        {
+          "path": "cognee-mcp/uv.lock",
+          "bytes": 1269254
+        },
+        {
+          "path": "assets/infographic_final.png",
+          "bytes": 1172260
+        }
+      ]
+    },
+    {
+      "name": "browser-use",
+      "source_repository": "https://github.com/browser-use/browser-use.git",
+      "source_commit": "4cbe921673b48a488f5415d9159249afd12a625b",
+      "vendored_path": "engines/browser-use",
+      "license": "MIT",
+      "excluded_paths": [],
+      "restriction": null,
+      "nested_submodules_materialized": false,
+      "file_count": 518,
+      "total_bytes": 8730236,
+      "aggregate_sha256": "ed2127cebd24f5e00e70b01169001751a85a2b27bc5e62d4ee46657bb33c1d94",
+      "largest_files": [
+        {
+          "path": "examples/apps/ad-use/output/landing_page_20250908_150030.png",
+          "bytes": 1522458
+        },
+        {
+          "path": "examples/apps/ad-use/output/ad_20250908_150030.png",
+          "bytes": 1424339
+        },
+        {
+          "path": "tests/mind2web_data/processed.json",
+          "bytes": 692743
+        },
+        {
+          "path": "browser_use/beta/service.py",
+          "bytes": 256276
+        },
+        {
+          "path": "tests/ci/test_beta_agent.py",
+          "bytes": 248396
+        },
+        {
+          "path": "static/hard_benchmark_v2.jpg",
+          "bytes": 235742
+        },
+        {
+          "path": "browser_use/agent/service.py",
+          "bytes": 164119
+        },
+        {
+          "path": "browser_use/browser/session.py",
+          "bytes": 162268
+        },
+        {
+          "path": "browser_use/browser/watchdogs/default_action_watchdog.py",
+          "bytes": 134773
+        },
+        {
+          "path": "static/accuracy_by_model_light.png",
+          "bytes": 120815
+        },
+        {
+          "path": "static/accuracy_by_model_dark.png",
+          "bytes": 120187
+        },
+        {
+          "path": "browser_use/tools/service.py",
+          "bytes": 93504
+        },
+        {
+          "path": "CLOUD.md",
+          "bytes": 75222
+        },
+        {
+          "path": "tests/ci/infrastructure/test_filesystem.py",
+          "bytes": 60160
+        },
+        {
+          "path": "browser_use/browser/watchdogs/downloads_watchdog.py",
+          "bytes": 56973
+        },
+        {
+          "path": "browser_use/dom/serializer/serializer.py",
+          "bytes": 55578
+        },
+        {
+          "path": "browser_use/browser/profile.py",
+          "bytes": 52654
+        },
+        {
+          "path": "browser_use/dom/service.py",
+          "bytes": 50092
+        },
+        {
+          "path": "static/NiceHack69.png",
+          "bytes": 47357
+        },
+        {
+          "path": "browser_use/browser/demo_mode.py",
+          "bytes": 46125
+        }
+      ]
+    },
+    {
+      "name": "open-webui",
+      "source_repository": "https://github.com/open-webui/open-webui.git",
+      "source_commit": "8bd8b4fac5e059578ac0c74b3c18d11139f88b7d",
+      "vendored_path": "engines/open-webui",
+      "license": "Open WebUI License; branding preservation applies",
+      "excluded_paths": [],
+      "restriction": "Open WebUI branding must remain intact except where its license expressly permits alteration.",
+      "nested_submodules_materialized": false,
+      "file_count": 5065,
+      "total_bytes": 43625476,
+      "aggregate_sha256": "fd22dade09dc204a54de3411328400b9cb92c3d3f6cced477ac2f96b6ed41210",
+      "largest_files": [
+        {
+          "path": "backend/open_webui/static/swagger-ui/swagger-ui-bundle.js",
+          "bytes": 2386730
+        },
+        {
+          "path": "static/assets/welcome.mp4",
+          "bytes": 1926421
+        },
+        {
+          "path": "CHANGELOG.md",
+          "bytes": 1289200
+        },
+        {
+          "path": "uv.lock",
+          "bytes": 817681
+        },
+        {
+          "path": "static/assets/fonts/Inter-Variable.ttf",
+          "bytes": 804612
+        },
+        {
+          "path": "static/sql.js/sql-wasm.wasm",
+          "bytes": 659730
+        },
+        {
+          "path": "package-lock.json",
+          "bytes": 547221
+        },
+        {
+          "path": "src/lib/i18n/locales/bo-TB/translation.json",
+          "bytes": 445910
+        },
+        {
+          "path": "src/lib/i18n/locales/bn-BD/translation.json",
+          "bytes": 404299
+        },
+        {
+          "path": "src/lib/i18n/locales/bg-BG/translation.json",
+          "bytes": 347752
+        },
+        {
+          "path": "src/lib/i18n/locales/ru-RU/translation.json",
+          "bytes": 345928
+        },
+        {
+          "path": "src/lib/i18n/locales/uk-UA/translation.json",
+          "bytes": 341326
+        },
+        {
+          "path": "src/lib/i18n/locales/ta-IN/translation.json",
+          "bytes": 328247
+        },
+        {
+          "path": "src/lib/i18n/locales/ar/translation.json",
+          "bytes": 311192
+        },
+        {
+          "path": "src/lib/i18n/locales/ar-BH/translation.json",
+          "bytes": 311023
+        },
+        {
+          "path": "backend/open_webui/utils/middleware.py",
+          "bytes": 304662
+        },
+        {
+          "path": "demo.png",
+          "bytes": 288037
+        },
+        {
+          "path": "src/lib/i18n/locales/ja-JP/translation.json",
+          "bytes": 283495
+        },
+        {
+          "path": "src/lib/i18n/locales/ceb-PH/translation.json",
+          "bytes": 269021
+        },
+        {
+          "path": "src/lib/i18n/locales/az-AZ/translation.json",
+          "bytes": 267780
+        }
+      ]
+    },
+    {
+      "name": "pageindex",
+      "source_repository": "https://github.com/VectifyAI/PageIndex.git",
+      "source_commit": "037a7dbacfb9a19f38b354ce60cee5094b3f854c",
+      "vendored_path": "engines/pageindex",
+      "license": "MIT",
+      "excluded_paths": [],
+      "restriction": null,
+      "nested_submodules_materialized": false,
+      "file_count": 177,
+      "total_bytes": 32753657,
+      "aggregate_sha256": "112bfebeb7f7ba9c896401cc31ccc74d67cf79d893af3bdaefb380aab52429cb",
+      "largest_files": [
+        {
+          "path": "examples/documents/PRML.pdf",
+          "bytes": 18090775
+        },
+        {
+          "path": "examples/documents/2023-annual-report.pdf",
+          "bytes": 2255266
+        },
+        {
+          "path": "examples/documents/Regulation Best Interest_proposed rule.pdf",
+          "bytes": 1803860
+        },
+        {
+          "path": "cookbook/pageindex-citation.ipynb",
+          "bytes": 1761401
+        },
+        {
+          "path": "examples/documents/2023-annual-report-truncated.pdf",
+          "bytes": 1463411
+        },
+        {
+          "path": "examples/documents/attention-residuals.pdf",
+          "bytes": 1065095
+        },
+        {
+          "path": "examples/documents/earthmover.pdf",
+          "bytes": 1036803
+        },
+        {
+          "path": "examples/documents/Regulation Best Interest_Interpretive release.pdf",
+          "bytes": 357253
+        },
+        {
+          "path": "pageindex/flash/data/boilerplate_phrases.json",
+          "bytes": 345981
+        },
+        {
+          "path": "examples/documents/four-lectures.pdf",
+          "bytes": 310124
+        },
+        {
+          "path": "pageindex/flash/data/dictionaries.json",
+          "bytes": 221647
+        },
+        {
+          "path": "tests/test_local_chat.py",
+          "bytes": 193421
+        },
+        {
+          "path": "tests/test_client.py",
+          "bytes": 151045
+        },
+        {
+          "path": "assets/index-cost-dark.png",
+          "bytes": 149965
+        },
+        {
+          "path": "tests/test_agent_tools.py",
+          "bytes": 148094
+        },
+        {
+          "path": "assets/results-dark.png",
+          "bytes": 146948
+        },
+        {
+          "path": "assets/index-cost-light.png",
+          "bytes": 144894
+        },
+        {
+          "path": "assets/results-light.png",
+          "bytes": 143106
+        },
+        {
+          "path": "assets/index-time-dark.png",
+          "bytes": 140246
+        },
+        {
+          "path": "pageindex/client.py",
+          "bytes": 135324
+        }
+      ]
+    },
+    {
+      "name": "agent-reach",
+      "source_repository": "https://github.com/Panniantong/Agent-Reach.git",
+      "source_commit": "a19a171fa980a0785849596492e0af4db800c82f",
+      "vendored_path": "engines/agent-reach",
+      "license": "MIT",
+      "excluded_paths": [],
+      "restriction": null,
+      "nested_submodules_materialized": false,
+      "file_count": 122,
+      "total_bytes": 1270538,
+      "aggregate_sha256": "98d2dc51cf09ca49cafb03d7271ed31b4c248a57fe143aa466cf6ffee68102fa",
+      "largest_files": [
+        {
+          "path": "docs/wechat-group-qr.jpg",
+          "bytes": 148332
+        },
+        {
+          "path": "docs/assets/logo-2.png",
+          "bytes": 92351
+        },
+        {
+          "path": "agent_reach/cli.py",
+          "bytes": 89749
+        },
+        {
+          "path": "tests/test_channels.py",
+          "bytes": 65038
+        },
+        {
+          "path": "docs/assets/logo-1.png",
+          "bytes": 62369
+        },
+        {
+          "path": "docs/assets/logo-3.png",
+          "bytes": 48799
+        },
+        {
+          "path": "tests/test_p0_cli.py",
+          "bytes": 40315
+        },
+        {
+          "path": "docs/assets/sponsors/astraflow.png",
+          "bytes": 37174
+        },
+        {
+          "path": "tests/test_transcribe.py",
+          "bytes": 32193
+        },
+        {
+          "path": "docs/assets/sponsors/coreclaw.png",
+          "bytes": 23725
+        },
+        {
+          "path": "README.md",
+          "bytes": 22830
+        },
+        {
+          "path": "docs/install.md",
+          "bytes": 22167
+        },
+        {
+          "path": "docs/README_ja.md",
+          "bytes": 21946
+        },
+        {
+          "path": "docs/README_en.md",
+          "bytes": 21927
+        },
+        {
+          "path": "tests/test_private_file_writes.py",
+          "bytes": 20874
+        },
+        {
+          "path": "docs/README_ko.md",
+          "bytes": 20790
+        },
+        {
+          "path": "tests/test_cli.py",
+          "bytes": 17925
+        },
+        {
+          "path": "agent_reach/cookie_extract.py",
+          "bytes": 16398
+        },
+        {
+          "path": "agent_reach/transcribe.py",
+          "bytes": 16108
+        },
+        {
+          "path": "agent_reach/channels/boss.py",
+          "bytes": 14515
+        }
+      ]
+    },
+    {
+      "name": "qwen-audio-agent",
+      "source_repository": "https://github.com/QwenAudio/qwen-audio-agent.git",
+      "source_commit": "a73bcbc2e1278bf664df38bdd169ffba1fb2451f",
+      "vendored_path": "engines/qwen-audio-agent",
+      "license": "Apache-2.0",
+      "excluded_paths": [],
+      "restriction": null,
+      "nested_submodules_materialized": false,
+      "file_count": 1418,
+      "total_bytes": 58981775,
+      "aggregate_sha256": "77f995e9641476e4064286e57fad90a2b1f2f9c07f05cfa4a517da0dc5fbf6d7",
+      "largest_files": [
+        {
+          "path": "examples/smart-cockpit/client/public/tesla-model-3.glb",
+          "bytes": 22519900
+        },
+        {
+          "path": "examples/customer-service/assets/customer-service-demo.mp4",
+          "bytes": 9466799
+        },
+        {
+          "path": "examples/digital-human/assets/digital-human-demo.mp4",
+          "bytes": 5992115
+        },
+        {
+          "path": "docs/promo/media/social-banner.png",
+          "bytes": 1273469
+        },
+        {
+          "path": "examples/smart-cockpit/client/src/assets/personas/wild-character.png",
+          "bytes": 864082
+        },
+        {
+          "path": "docs/desktop-fluid-orb-thinking.gif",
+          "bytes": 828997
+        },
+        {
+          "path": "examples/smart-cockpit/client/src/assets/personas/healer-character.png",
+          "bytes": 777510
+        },
+        {
+          "path": "examples/smart-cockpit/client/src/assets/personas/action-character.png",
+          "bytes": 767436
+        },
+        {
+          "path": "desktop/build/icon.icns",
+          "bytes": 745427
+        },
+        {
+          "path": "docs/architecture-overview.png",
+          "bytes": 732845
+        },
+        {
+          "path": "docs/desktop-goo-orb-thinking.gif",
+          "bytes": 716946
+        },
+        {
+          "path": "docs/architecture-overview-en.png",
+          "bytes": 650494
+        },
+        {
+          "path": "examples/smart-cockpit/client/src/assets/skills/music-master.png",
+          "bytes": 618004
+        },
+        {
+          "path": "examples/smart-cockpit/client/src/assets/skills/navigator.png",
+          "bytes": 609658
+        },
+        {
+          "path": "examples/smart-cockpit/client/src/assets/skills/vehicle-control.png",
+          "bytes": 589915
+        },
+        {
+          "path": "docs/qwen-audio-agent-three-layer-architecture.png",
+          "bytes": 451233
+        },
+        {
+          "path": "package-lock.json",
+          "bytes": 415998
+        },
+        {
+          "path": "docs/qwen-audio-agent-two-layer-architecture.png",
+          "bytes": 309788
+        },
+        {
+          "path": "docs/wechat-group-qr.png",
+          "bytes": 239139
+        },
+        {
+          "path": "desktop/build/icon.png",
+          "bytes": 209651
+        }
+      ]
+    }
+  ]
+}
