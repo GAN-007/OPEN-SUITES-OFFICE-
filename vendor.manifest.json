@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "source_lock_schema_version": 2,
+  "snapshot_date": "2026-09-27",
+  "engines": [
+    {
+      "name": "agent-reach",
+      "repository": "https://github.com/Panniantong/Agent-Reach.git",
+      "commit": "a19a171fa980a0785849596492e0af4db800c82f",
+      "source_path": "upstream/agent-reach",
+      "vendor_path": "engines/agent-reach",
+      "file_count": 122,
+      "tree_sha256": "6031d5e0897a107723988fb71008a56b2681bb60302e9aedb33de6b00f1856ae",
+      "restricted_paths": [],
+      "license": "MIT"
+    },
+    {
+      "name": "browser-use",
+      "repository": "https://github.com/browser-use/browser-use.git",
+      "commit": "4cbe921673b48a488f5415d9159249afd12a625b",
+      "source_path": "upstream/browser-use",
+      "vendor_path": "engines/browser-use",
+      "file_count": 518,
+      "tree_sha256": "5b9954fa2387ddb00b1754644440bdbafaec75cd623dcb8062ffc6f5d18c2e42",
+      "restricted_paths": [],
+      "license": "MIT"
+    },
+    {
+      "name": "cognee",
+      "repository": "https://github.com/topoteretes/cognee.git",
+      "commit": "eb90d03740755f5252b8b12cce91fd09970f2d81",
+      "source_path": "upstream/cognee",
+      "vendor_path": "engines/cognee",
+      "file_count": 3883,
+      "tree_sha256": "cfc643aaf1ae42ba97ef6cc6f771ac4de8a1f1b723130c50448bb894e4a1b720",
+      "restricted_paths": [],
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "genoffice",
+      "repository": "https://github.com/genspark-ai/genoffice.git",
+      "commit": "d9cd4895b99b3e65aa8beea13f95b232329f4c11",
+      "source_path": "upstream/genoffice",
+      "vendor_path": "engines/genoffice",
+      "file_count": 3659,
+      "tree_sha256": "47b12aa6d2c528bf6a28c88d89b7b849b966c5f3c261d3349090043f4aa3106c",
+      "restricted_paths": [
+        {
+          "path": "ee",
+          "reason": "GenOffice Enterprise License permits copy/use for development and testing, but redistribution or production use requires a valid enterprise agreement with Mainfunc, Inc.",
+          "local_overlay_supported": true
+        }
+      ],
+      "license": "Apache-2.0 for core; ee/ uses GenOffice Enterprise License"
+    },
+    {
+      "name": "graphiti",
+      "repository": "https://github.com/getzep/graphiti.git",
+      "commit": "6b4b56ff6f4b1e4e69c3c3c5487cf1b8762c483a",
+      "source_path": "upstream/graphiti",
+      "vendor_path": "engines/graphiti",
+      "file_count": 384,
+      "tree_sha256": "7c5f54e057343b2ab5a715df4a71e0e406772ed30d83d05e32f3e04e6038d218",
+      "restricted_paths": [],
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "open-webui",
+      "repository": "https://github.com/open-webui/open-webui.git",
+      "commit": "8bd8b4fac5e059578ac0c74b3c18d11139f88b7d",
+      "source_path": "upstream/open-webui",
+      "vendor_path": "engines/open-webui",
+      "file_count": 5065,
+      "tree_sha256": "5575570f464187d4b61726bb0a799c8f5f7ceab87f0d4cd02b5f8fe76ada6662",
+      "restricted_paths": [],
+      "license": "Open WebUI License; source redistribution permitted while current branding-preservation and other license conditions are retained"
+    },
+    {
+      "name": "openmaic",
+      "repository": "https://github.com/THU-MAIC/OpenMAIC.git",
+      "commit": "f2875426ae5712d26f0a76e54e9de763e86027a6",
+      "source_path": "upstream/openmaic",
+      "vendor_path": "engines/openmaic",
+      "file_count": 3126,
+      "tree_sha256": "c3e486f2710bbf542693976b075a2034120c94cf70588f4ace1dbf2955e917d0",
+      "restricted_paths": [],
+      "license": "MIT"
+    },
+    {
+      "name": "pageindex",
+      "repository": "https://github.com/VectifyAI/PageIndex.git",
+      "commit": "037a7dbacfb9a19f38b354ce60cee5094b3f854c",
+      "source_path": "upstream/pageindex",
+      "vendor_path": "engines/pageindex",
+      "file_count": 177,
+      "tree_sha256": "ae7913a3ffbec858d2d9b30d4b6ef6095261388cc290db67ab2f94b94edaa767",
+      "restricted_paths": [],
+      "license": "MIT"
+    },
+    {
+      "name": "qwen-audio-agent",
+      "repository": "https://github.com/QwenAudio/qwen-audio-agent.git",
+      "commit": "a73bcbc2e1278bf664df38bdd169ffba1fb2451f",
+      "source_path": "upstream/qwen-audio-agent",
+      "vendor_path": "engines/qwen-audio-agent",
+      "file_count": 1418,
+      "tree_sha256": "96e24c16bd5baf4840b1517c428f9035b6040d2fb8d7d58cfbbf1462a3c137c4",
+      "restricted_paths": [],
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "weknora",
+      "repository": "https://github.com/Tencent/WeKnora.git",
+      "commit": "9114e4e4f905be71976a77c684d3f92731e6f9a6",
+      "source_path": "upstream/weknora",
+      "vendor_path": "engines/weknora",
+      "file_count": 4604,
+      "tree_sha256": "725caf0763a95d343caee99e041e5eee0210f88b91d12bf78b28a344d5f404a6",
+      "restricted_paths": [],
+      "license": "MIT core with third-party component notices"
+    }
+  ]
+}
