@@ -1,0 +1,51 @@
+name: Vendor Pinned Engine Sources
+on:
+  push:
+    branches:
+      - feat/nexus-inhouse-vendor
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vendor-pinned-engines
+  cancel-in-progress: false
+
+jobs:
+  vendor:
+    if: ${{ !contains(github.event.head_commit.message, '[vendor-sync]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          submodules: recursive
+          lfs: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify source lock
+        run: python scripts/verify_lock.py
+      - name: Materialize complete redistributable engine sources
+        run: python scripts/vendor_upstreams.py
+      - name: Stage complete engine source snapshots
+        run: git add -f engines
+      - name: Finalize Git-canonical vendor manifest
+        run: |
+          python scripts/finalize_vendor_manifest.py
+          git add -f vendor.manifest.json
+      - name: Verify canonical source-to-vendor parity
+        run: python scripts/verify_vendored.py --compare-sources
+      - name: Commit vendored source snapshots
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --cached --quiet; then
+            echo "Vendored source is already synchronized."
+            exit 0
+          fi
+          git commit -m "chore: vendor pinned engine source snapshots [vendor-sync]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

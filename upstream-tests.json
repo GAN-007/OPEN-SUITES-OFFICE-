@@ -1,65 +1,255 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "source": "vendored",
   "engines": {
     "genoffice": {
-      "path": "upstream/genoffice",
-      "install": [["npm", "ci"]],
-      "build": [["npm", "run", "build:all"]],
-      "test": [["npm", "test"]]
+      "path": "engines/genoffice",
+      "install": [
+        [
+          "npm",
+          "ci"
+        ]
+      ],
+      "build": [
+        [
+          "npm",
+          "run",
+          "build:all"
+        ]
+      ],
+      "test": [
+        [
+          "npm",
+          "test"
+        ]
+      ]
     },
     "openmaic": {
-      "path": "upstream/openmaic",
-      "install": [["corepack", "pnpm", "install", "--frozen-lockfile"]],
-      "build": [["corepack", "pnpm", "build"]],
-      "test": [["corepack", "pnpm", "test"]]
+      "path": "engines/openmaic",
+      "install": [
+        [
+          "corepack",
+          "pnpm",
+          "install",
+          "--frozen-lockfile"
+        ]
+      ],
+      "build": [
+        [
+          "corepack",
+          "pnpm",
+          "run",
+          "build"
+        ]
+      ],
+      "test": [
+        [
+          "corepack",
+          "pnpm",
+          "test"
+        ]
+      ]
     },
     "weknora": {
-      "path": "upstream/weknora",
-      "install": [["go", "mod", "download"]],
-      "build": [["go", "build", "./cmd/server"]],
-      "test": [["go", "test", "./..."]]
+      "path": "engines/weknora",
+      "install": [
+        [
+          "go",
+          "mod",
+          "download"
+        ]
+      ],
+      "build": [
+        [
+          "go",
+          "build",
+          "./cmd/server"
+        ]
+      ],
+      "test": [
+        [
+          "go",
+          "test",
+          "./..."
+        ]
+      ]
     },
     "graphiti": {
-      "path": "upstream/graphiti",
-      "install": [["uv", "sync", "--all-extras", "--dev"]],
+      "path": "engines/graphiti",
+      "install": [
+        [
+          "uv",
+          "sync",
+          "--all-extras",
+          "--dev"
+        ]
+      ],
       "build": [],
-      "test": [["uv", "run", "pytest"]]
+      "test": [
+        [
+          "uv",
+          "run",
+          "pytest"
+        ]
+      ]
     },
     "cognee": {
-      "path": "upstream/cognee",
-      "install": [["uv", "sync"]],
+      "path": "engines/cognee",
+      "install": [
+        [
+          "uv",
+          "sync",
+          "--extra",
+          "api",
+          "--extra",
+          "docs",
+          "--extra",
+          "evals",
+          "--extra",
+          "ollama",
+          "--extra",
+          "dev",
+          "--extra",
+          "neo4j",
+          "--extra",
+          "redis",
+          "--extra",
+          "tracing",
+          "--extra",
+          "postgres",
+          "--extra",
+          "aws",
+          "--extra",
+          "neptune",
+          "--extra",
+          "langchain",
+          "--extra",
+          "dlt"
+        ]
+      ],
       "build": [],
-      "test": [["uv", "run", "pytest"]]
+      "test": [
+        [
+          "uv",
+          "run",
+          "pytest",
+          "cognee/tests/unit",
+          "--import-mode=importlib"
+        ]
+      ]
     },
     "browser-use": {
-      "path": "upstream/browser-use",
-      "install": [["uv", "sync", "--all-extras", "--dev"]],
+      "path": "engines/browser-use",
+      "install": [
+        [
+          "uv",
+          "sync",
+          "--all-extras",
+          "--dev"
+        ]
+      ],
       "build": [],
-      "test": [["uv", "run", "pytest"]]
+      "test": [
+        [
+          "uv",
+          "run",
+          "pytest"
+        ]
+      ]
     },
     "open-webui": {
-      "path": "upstream/open-webui",
-      "install": [["npm", "ci"]],
-      "build": [["npm", "run", "build"]],
-      "test": [["npm", "run", "test:frontend"]]
+      "path": "engines/open-webui",
+      "install": [
+        [
+          "npm",
+          "ci"
+        ]
+      ],
+      "build": [
+        [
+          "bash",
+          "-lc",
+          "NODE_OPTIONS=--max-old-space-size=6144 npm run build"
+        ]
+      ],
+      "test": [
+        [
+          "npm",
+          "run",
+          "test:frontend"
+        ]
+      ]
     },
     "pageindex": {
-      "path": "upstream/pageindex",
-      "install": [["python3", "-m", "pip", "install", "-e", ".[dev]"]],
+      "path": "engines/pageindex",
+      "install": [
+        [
+          "python3",
+          "-m",
+          "pip",
+          "install",
+          "-e",
+          "."
+        ],
+        [
+          "python3",
+          "-m",
+          "pip",
+          "install",
+          "pytest>=7"
+        ]
+      ],
       "build": [],
-      "test": [["pytest"]]
+      "test": [
+        [
+          "python3",
+          "-m",
+          "pytest"
+        ]
+      ]
     },
     "agent-reach": {
-      "path": "upstream/agent-reach",
-      "install": [["python3", "-m", "pip", "install", "-e", ".[dev]"]],
+      "path": "engines/agent-reach",
+      "install": [
+        [
+          "python3",
+          "-m",
+          "pip",
+          "install",
+          "-e",
+          ".[dev]"
+        ]
+      ],
       "build": [],
-      "test": [["pytest"]]
+      "test": [
+        [
+          "python3",
+          "-m",
+          "pytest"
+        ]
+      ]
     },
     "qwen-audio-agent": {
-      "path": "upstream/qwen-audio-agent",
-      "install": [["npm", "ci"]],
-      "build": [],
-      "test": [["npm", "test"]]
+      "path": "engines/qwen-audio-agent",
+      "install": [
+        [
+          "npm",
+          "ci"
+        ]
+      ],
+      "build": [
+        [
+          "npm",
+          "run",
+          "build"
+        ]
+      ],
+      "test": [
+        [
+          "npm",
+          "test"
+        ]
+      ]
     }
   }
 }

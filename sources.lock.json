@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "snapshot_date": "2026-09-27",
   "sources": [
     {
@@ -8,7 +8,15 @@
       "commit": "d9cd4895b99b3e65aa8beea13f95b232329f4c11",
       "branch": "main",
       "license": "Apache-2.0 for core; ee/ uses GenOffice Enterprise License",
-      "path": "upstream/genoffice"
+      "path": "upstream/genoffice",
+      "vendor_path": "engines/genoffice",
+      "restricted_paths": [
+        {
+          "path": "ee",
+          "reason": "GenOffice Enterprise License permits copy/use for development and testing, but redistribution or production use requires a valid enterprise agreement with Mainfunc, Inc.",
+          "local_overlay_supported": true
+        }
+      ]
     },
     {
       "name": "openmaic",
@@ -16,7 +24,9 @@
       "commit": "f2875426ae5712d26f0a76e54e9de763e86027a6",
       "branch": "main",
       "license": "MIT",
-      "path": "upstream/openmaic"
+      "path": "upstream/openmaic",
+      "vendor_path": "engines/openmaic",
+      "restricted_paths": []
     },
     {
       "name": "weknora",
@@ -24,7 +34,9 @@
       "commit": "9114e4e4f905be71976a77c684d3f92731e6f9a6",
       "branch": "main",
       "license": "MIT core with third-party component notices",
-      "path": "upstream/weknora"
+      "path": "upstream/weknora",
+      "vendor_path": "engines/weknora",
+      "restricted_paths": []
     },
     {
       "name": "graphiti",
@@ -32,7 +44,9 @@
       "commit": "6b4b56ff6f4b1e4e69c3c3c5487cf1b8762c483a",
       "branch": "main",
       "license": "Apache-2.0",
-      "path": "upstream/graphiti"
+      "path": "upstream/graphiti",
+      "vendor_path": "engines/graphiti",
+      "restricted_paths": []
     },
     {
       "name": "cognee",
@@ -40,7 +54,9 @@
       "commit": "eb90d03740755f5252b8b12cce91fd09970f2d81",
       "branch": "main",
       "license": "Apache-2.0",
-      "path": "upstream/cognee"
+      "path": "upstream/cognee",
+      "vendor_path": "engines/cognee",
+      "restricted_paths": []
     },
     {
       "name": "browser-use",
@@ -48,15 +64,20 @@
       "commit": "4cbe921673b48a488f5415d9159249afd12a625b",
       "branch": "main",
       "license": "MIT",
-      "path": "upstream/browser-use"
+      "path": "upstream/browser-use",
+      "vendor_path": "engines/browser-use",
+      "restricted_paths": []
     },
     {
       "name": "open-webui",
       "repository": "https://github.com/open-webui/open-webui.git",
       "commit": "8bd8b4fac5e059578ac0c74b3c18d11139f88b7d",
       "branch": "main",
-      "license": "Open WebUI License; branding preservation requirements apply to current code",
-      "path": "upstream/open-webui"
+      "license": "Open WebUI License; source redistribution permitted while current branding-preservation and other license conditions are retained",
+      "path": "upstream/open-webui",
+      "vendor_path": "engines/open-webui",
+      "restricted_paths": [],
+      "branding_preservation_required": true
     },
     {
       "name": "pageindex",
@@ -64,7 +85,9 @@
       "commit": "037a7dbacfb9a19f38b354ce60cee5094b3f854c",
       "branch": "main",
       "license": "MIT",
-      "path": "upstream/pageindex"
+      "path": "upstream/pageindex",
+      "vendor_path": "engines/pageindex",
+      "restricted_paths": []
     },
     {
       "name": "agent-reach",
@@ -72,7 +95,9 @@
       "commit": "a19a171fa980a0785849596492e0af4db800c82f",
       "branch": "main",
       "license": "MIT",
-      "path": "upstream/agent-reach"
+      "path": "upstream/agent-reach",
+      "vendor_path": "engines/agent-reach",
+      "restricted_paths": []
     },
     {
       "name": "qwen-audio-agent",
@@ -80,7 +105,9 @@
       "commit": "a73bcbc2e1278bf664df38bdd169ffba1fb2451f",
       "branch": "main",
       "license": "Apache-2.0",
-      "path": "upstream/qwen-audio-agent"
+      "path": "upstream/qwen-audio-agent",
+      "vendor_path": "engines/qwen-audio-agent",
+      "restricted_paths": []
     }
   ]
 }

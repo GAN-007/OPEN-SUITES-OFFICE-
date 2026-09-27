@@ -10,3 +10,4 @@ artifacts/*
 reports/source-audit.json
 upstream/*
 !upstream/.gitkeep
+engines/genoffice/ee/
