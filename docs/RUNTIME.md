@@ -1,21 +1,38 @@
 # Nexus Runtime
 
-## Clone the complete source federation
+## Runtime source policy
+
+Nexus defaults to `NEXUS_ENGINE_SOURCE_MODE=vendored`. Every adapter that executes code locally resolves its engine from `engines/<engine>` first and fails closed if that committed source tree is absent. `upstream/*` is an audit/refresh mirror, not the normal runtime.
+
+Verify a normal clone:
 
 ```bash
-git clone --recurse-submodules https://github.com/GAN-007/OPEN-SUITES-OFFICE-.git
-cd OPEN-SUITES-OFFICE-
 python3 scripts/verify_lock.py
-python3 scripts/verify_submodules.py
+python3 scripts/verify_vendored.py
+nexus source-status
 ```
 
-Every `upstream/*` directory is a real Git submodule pinned to the SHA in `sources.lock.json`. This preserves the complete source, history boundary, native test suite and license boundary of each specialist engine.
-
-## Start infrastructure
+## Rebuild the vendored engine trees from origin
 
 ```bash
-docker compose -f infra/docker-compose.yml up -d
+git submodule update --init --recursive
+python3 scripts/verify_submodules.py
+python3 scripts/vendor_upstreams.py
+python3 scripts/verify_vendored.py --compare-sources
 ```
+
+The verification compares deterministic file counts and SHA-256 tree digests after excluding only paths explicitly marked as non-redistributable in `sources.lock.json`.
+
+## GenOffice enterprise overlay
+
+`engines/genoffice/ee/` is deliberately absent from the public repository because its upstream enterprise license forbids redistribution without an enterprise agreement. For development/testing or an appropriately licensed production environment:
+
+```bash
+git submodule update --init upstream/genoffice
+python3 scripts/install_restricted.py --engine genoffice --acknowledge-license
+```
+
+The overlay is git-ignored.
 
 ## Run the control plane
 
@@ -27,22 +44,22 @@ cp .env.example .env
 nexus serve
 ```
 
-The API listens on `http://127.0.0.1:8787` by default. Swagger/OpenAPI is available at `/docs`.
-
-## Routing
-
-```bash
-nexus route 'Compare section 18.4 with appendix C in this long report'
-nexus route 'What did this customer believe before the March policy change?'
-nexus route 'Open the vendor portal and submit the approved form'
-```
-
-The router selects the canonical engine owner, while callers can explicitly override the engine or capability when required.
+The API listens on `http://127.0.0.1:8787` when configured that way and exposes Swagger/OpenAPI at `/docs`.
 
 ## Engine execution
 
-`POST /v1/execute` invokes the configured adapter. External-side-effect actions are rejected unless the caller explicitly marks the request approved. Native upstream UIs and CLIs remain directly usable; Nexus does not hide or replace any upstream surface.
+`POST /v1/execute` invokes the selected native adapter. Local CLI/SDK adapters execute with their working directory inside the vendored source tree. Server-oriented engines retain their native runtimes and can be launched from their own vendored directories; Nexus connects to them over their native HTTP/MCP/agent protocol surfaces.
 
-## Asset/version model
+Externally observable side effects remain approval-gated. Native upstream approval/security controls remain authoritative and can be stricter.
 
-`POST /v1/assets` stores immutable content-addressed versions. Further versions never overwrite prior bytes. Specialist indexes should reference the Nexus asset/version ID so source provenance remains reconstructable.
+## Native parity
+
+`upstream-tests.json` points at `engines/*`, not `upstream/*`. The manual **Native Vendored Engine Parity Gates** workflow initializes the locked source mirrors, proves source-to-vendor equality, then runs each engine's own install/build/test commands against the committed vendored copy.
+
+## Development infrastructure
+
+```bash
+docker compose -f infra/docker-compose.yml up -d
+```
+
+This supplies shared PostgreSQL, Redis, FalkorDB, Qdrant and MinIO services. Individual engines may require additional services, browser binaries, model weights or provider credentials defined by their retained native source.

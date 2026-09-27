@@ -1,4 +1,4 @@
-name: Upstream Parity Gates
+name: Native Vendored Engine Parity Gates
 on:
   workflow_dispatch:
     inputs:
@@ -10,7 +10,7 @@ on:
 jobs:
   parity:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
@@ -24,6 +24,7 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 1
+          lfs: false
       - uses: actions/setup-python@v5
         if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
         with:
@@ -39,15 +40,18 @@ jobs:
       - name: Install uv
         if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      - name: Verify pinned SHA
+      - name: Verify pinned source SHAs
         if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
         run: python scripts/verify_submodules.py
-      - name: Install upstream engine
+      - name: Verify committed vendor parity
+        if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
+        run: python scripts/verify_vendored.py --compare-sources
+      - name: Install vendored engine
         if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
         run: python scripts/engine_tasks.py install --engine '${{ matrix.engine }}' --stop-on-failure
-      - name: Build upstream engine
+      - name: Build vendored engine
         if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
         run: python scripts/engine_tasks.py build --engine '${{ matrix.engine }}' --stop-on-failure
-      - name: Test upstream engine
+      - name: Test vendored engine
         if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
         run: python scripts/engine_tasks.py test --engine '${{ matrix.engine }}' --stop-on-failure

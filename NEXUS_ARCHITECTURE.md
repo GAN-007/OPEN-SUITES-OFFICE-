@@ -4,7 +4,7 @@ Snapshot: 2026-09-27
 
 ## 1. Goal
 
-OPEN SUITES OFFICE — Nexus is a lossless capability federation of ten independently engineered AI systems. It does not replace any upstream implementation with a simplified rewrite. Each complete upstream repository remains a Git submodule pinned to an audited 40-character commit SHA, while Nexus-owned code provides the cross-engine control plane: capability routing, identity boundaries, approvals, asset/version identity, provenance, reproducible source locking, parity gates, and deployment infrastructure.
+OPEN SUITES OFFICE — Nexus is a lossless capability federation of ten independently engineered AI systems. It does not replace any upstream implementation with a simplified rewrite. Each redistributable upstream source tree is committed under `engines/*` at an audited revision, while pinned Git submodules under `upstream/*` remain reproducible source mirrors. Nexus-owned code provides the cross-engine control plane: capability routing, identity boundaries, approvals, asset/version identity, provenance, reproducible source locking, parity gates, and deployment infrastructure.
 
 The governing rule is preservation plus federation:
 
@@ -31,7 +31,7 @@ The governing rule is preservation plus federation:
 
 Total observed tracked files: 22,958.
 
-The authoritative machine-readable source list is `sources.lock.json`. The `.gitmodules` entries and Git tree gitlinks point to those same revisions.
+The authoritative machine-readable source list is `sources.lock.json`. Runtime source lives in `engines/*`; `vendor.manifest.json` records deterministic file counts and SHA-256 tree digests. The `.gitmodules` entries and gitlinks point to the same locked revisions and are used only to reproduce, audit, and refresh the vendored snapshots.
 
 ## 3. Architecture
 
@@ -203,7 +203,7 @@ Production deployment must add TLS, managed secrets, network policy, SSO/RBAC, i
 
 `scripts/audit_sources.py` inventories tracked files, extensions, top-level structure, code markers and license/notice files.
 
-The Git submodules are the primary source-preservation mechanism. The bootstrap/audit utilities provide an independent reproducibility and inspection path.
+The committed `engines/*` snapshots are the primary runtime source. Pinned Git submodules are the source-of-origin mirrors. `scripts/vendor_upstreams.py` copies every permitted tracked source file from the locked trees, `scripts/verify_vendored.py --compare-sources` proves tree parity, and the audit utilities provide an independent inspection path.
 
 ## 12. Native parity gates
 
@@ -247,9 +247,9 @@ Required parity areas include:
 
 ## 15. Licensing boundaries
 
-The root Apache-2.0 license applies only to Nexus-owned integration code. Every submodule remains governed by its upstream license, notices, trademarks and third-party terms.
+The root Apache-2.0 license applies only to Nexus-owned integration code. Every vendored engine directory retains and remains governed by its upstream license, notices, trademarks and third-party terms.
 
-In particular, the pinned Open WebUI code uses its current Open WebUI License with branding-preservation requirements, and GenOffice contains an `ee/` area under separate enterprise terms. Nexus keeps these boundaries visible rather than relicensing or silently rebadging upstream code.
+In particular, Open WebUI remains under its current Open WebUI License with branding-preservation requirements. GenOffice `ee/` is not redistributed in the public `engines/genoffice` snapshot because its separate enterprise license requires an enterprise agreement for redistribution or production use; a git-ignored local overlay is supported for licensed/development environments.
 
 ## 16. Upgrade procedure
 
@@ -268,6 +268,6 @@ No automated job may silently move pinned upstream revisions in production.
 
 ## 17. Definition of done
 
-Nexus is considered lossless only when all ten exact source trees are materializable, required native parity gates pass, specialist capabilities remain available, cross-engine scenarios pass, external side effects are policy checked, artifacts remain versioned and traceable, retrieval provides evidence, durable workflow state survives restart where applicable, upgrade changes are reproducible, and license/trademark boundaries remain intact.
+Nexus is considered lossless only when all ten locked source trees are reproducible, all redistributable source is committed under `engines/*` with verified source-to-vendor parity, required native parity gates pass, specialist capabilities remain available, cross-engine scenarios pass, external side effects are policy checked, artifacts remain versioned and traceable, retrieval provides evidence, durable workflow state survives restart where applicable, upgrade changes are reproducible, and license/trademark boundaries remain intact. Separately licensed source may be activated only as a local licensed overlay and is not counted as a public redistribution.
 
 Anything less is an integration subset rather than the full lossless federation.

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shlex
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -18,6 +19,10 @@ class Settings(BaseSettings):
     artifact_dir: Path = Path("artifacts")
     execution_timeout_seconds: int = Field(default=120, ge=1, le=3600)
     require_approval_for_side_effects: bool = True
+
+    engine_source_mode: Literal["vendored", "upstream", "auto"] = "vendored"
+    engine_dir: Path = Path("engines")
+    upstream_dir: Path = Path("upstream")
 
     openmaic_url: str | None = None
     weknora_url: str | None = None
