@@ -1,0 +1,20 @@
+server:
+  transport: "http"
+  host: "127.0.0.1"
+  port: 8002
+
+llm:
+  provider: "openai"
+  model: "gpt-5.5"
+
+embedder:
+  provider: "openai"
+  model: "text-embedding-3-small"
+
+database:
+  provider: "falkordb"
+  providers:
+    falkordb:
+      uri: "redis://127.0.0.1:6380"
+      password: ""
+      database: "nexus_graphiti"

@@ -5,8 +5,10 @@ __pycache__/
 .venv/
 .env
 state/*.db
+state/runtime/
 artifacts/*
 !artifacts/.gitkeep
 reports/source-audit.json
-upstream/*
-!upstream/.gitkeep
+
+# Runtime/build outputs are governed by each vendored engine's own .gitignore.
+# The engines/ source trees themselves are intentionally tracked.

@@ -1,53 +1,103 @@
-name: Upstream Parity Gates
+name: Vendored Engine Native Parity
+
 on:
+  pull_request:
+    branches: [main]
   workflow_dispatch:
     inputs:
       engine:
-        description: 'Engine name or all'
+        description: "Engine name or all"
         required: true
         default: all
+      phase:
+        description: "Phase for manual runs"
+        required: true
+        default: full
+        type: choice
+        options: [full, install, build, test]
+
+permissions:
+  contents: read
 
 jobs:
   parity:
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
-        engine: [genoffice, openmaic, weknora, graphiti, cognee, browser-use, open-webui, pageindex, agent-reach, qwen-audio-agent]
+        engine:
+          - genoffice
+          - openmaic
+          - weknora
+          - graphiti
+          - cognee
+          - browser-use
+          - open-webui
+          - pageindex
+          - agent-reach
+          - qwen-audio-agent
+
     steps:
-      - name: Skip engines outside requested scope
-        if: ${{ inputs.engine != 'all' && inputs.engine != matrix.engine }}
-        run: echo "Skipping ${{ matrix.engine }}"
+      - name: Select engine
+        id: select
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" || "${{ inputs.engine }}" == "all" || "${{ inputs.engine }}" == "${{ matrix.engine }}" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
-        if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
+        if: steps.select.outputs.run == 'true'
         with:
-          submodules: recursive
-          fetch-depth: 1
+          lfs: true
+
       - uses: actions/setup-python@v5
-        if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
+        if: steps.select.outputs.run == 'true'
         with:
           python-version: '3.12'
+
       - uses: actions/setup-node@v4
-        if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
+        if: steps.select.outputs.run == 'true'
         with:
           node-version: '22.22.2'
+
       - uses: actions/setup-go@v5
-        if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
+        if: steps.select.outputs.run == 'true'
         with:
           go-version: '1.24.x'
+
+      - name: Enable Corepack
+        if: steps.select.outputs.run == 'true'
+        run: corepack enable
+
       - name: Install uv
-        if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-      - name: Verify pinned SHA
-        if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
-        run: python scripts/verify_submodules.py
-      - name: Install upstream engine
-        if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
+        if: steps.select.outputs.run == 'true'
+        uses: astral-sh/setup-uv@v6
+
+      - name: Verify source before native parity
+        if: steps.select.outputs.run == 'true'
+        run: |
+          python scripts/verify_lock.py
+          python scripts/verify_vendored.py --require
+          python scripts/verify_engine_contracts.py
+
+      - name: Install native dependencies
+        if: >-
+          steps.select.outputs.run == 'true' &&
+          (github.event_name == 'pull_request' || inputs.phase == 'full' || inputs.phase == 'install')
         run: python scripts/engine_tasks.py install --engine '${{ matrix.engine }}' --stop-on-failure
-      - name: Build upstream engine
-        if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
+
+      - name: Build native engine
+        if: >-
+          steps.select.outputs.run == 'true' &&
+          (github.event_name == 'pull_request' || inputs.phase == 'full' || inputs.phase == 'build')
         run: python scripts/engine_tasks.py build --engine '${{ matrix.engine }}' --stop-on-failure
-      - name: Test upstream engine
-        if: ${{ inputs.engine == 'all' || inputs.engine == matrix.engine }}
+
+      - name: Test native engine
+        if: >-
+          steps.select.outputs.run == 'true' &&
+          (github.event_name == 'pull_request' || inputs.phase == 'full' || inputs.phase == 'test')
         run: python scripts/engine_tasks.py test --engine '${{ matrix.engine }}' --stop-on-failure

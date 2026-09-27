@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 from functools import lru_cache
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 
@@ -10,8 +11,17 @@ from .adapters.registry import AdapterRegistry
 from .assets import AssetStore
 from .config import Settings
 from .database import Database
-from .models import AssetCreate, AssetVersion, ExecuteRequest, ExecuteResult, RouteDecision, RouteRequest
+from .models import (
+    AssetCreate,
+    AssetVersion,
+    EngineName,
+    ExecuteRequest,
+    ExecuteResult,
+    RouteDecision,
+    RouteRequest,
+)
 from .routing import CapabilityRouter
+from .runtime import NativeProcessManager, RuntimeCatalog
 from .service import ApprovalRequired, NexusService
 
 
@@ -26,8 +36,18 @@ def db() -> Database:
 
 
 @lru_cache
+def runtime_catalog() -> RuntimeCatalog:
+    return RuntimeCatalog(settings().runtime_manifest, Path.cwd())
+
+
+@lru_cache
+def process_manager() -> NativeProcessManager:
+    return NativeProcessManager(runtime_catalog(), settings().runtime_state_dir)
+
+
+@lru_cache
 def adapters() -> AdapterRegistry:
-    return AdapterRegistry(settings())
+    return AdapterRegistry(settings(), Path.cwd())
 
 
 @lru_cache
@@ -37,20 +57,89 @@ def assets() -> AssetStore:
 
 @lru_cache
 def service() -> NexusService:
-    return NexusService(db(), adapters(), CapabilityRouter(), settings().require_approval_for_side_effects)
+    return NexusService(
+        db(),
+        adapters(),
+        CapabilityRouter(),
+        settings().require_approval_for_side_effects,
+    )
 
 
-app = FastAPI(title="OPEN SUITES OFFICE — Nexus Control Plane", version="0.1.0")
+app = FastAPI(title="OPEN SUITES OFFICE — Nexus Control Plane", version="0.2.0")
+
+
+@app.get("/")
+def root() -> dict:
+    return {
+        "name": "OPEN SUITES OFFICE — Nexus",
+        "version": "0.2.0",
+        "storage_model": "vendored-source-tree",
+        "engine_count": len(list(EngineName)),
+        "docs": "/docs",
+    }
 
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "engines": [item.status().model_dump(mode="json") for item in adapters().adapters.values()]}
+    return {
+        "status": "ok",
+        "storage_model": "vendored-source-tree",
+        "engines": [
+            {
+                **item.status().model_dump(mode="json"),
+                "native": process_manager().process_status(item.engine),
+            }
+            for item in adapters().adapters.values()
+        ],
+    }
 
 
 @app.get("/v1/engines")
 def engines() -> list[dict]:
-    return [item.status().model_dump(mode="json") for item in adapters().adapters.values()]
+    return [
+        {
+            **adapter.status().model_dump(mode="json"),
+            "native": process_manager().process_status(adapter.engine),
+        }
+        for adapter in adapters().adapters.values()
+    ]
+
+
+@app.get("/v1/native/engines")
+def native_engines() -> list[dict]:
+    return [process_manager().process_status(spec.engine) for spec in runtime_catalog().all()]
+
+
+@app.get("/v1/native/engines/{engine}")
+def native_engine(engine: EngineName) -> dict:
+    return process_manager().process_status(engine)
+
+
+@app.post("/v1/native/engines/{engine}/start")
+def native_engine_start(engine: EngineName) -> dict:
+    try:
+        return process_manager().start(engine)
+    except (ValueError, FileNotFoundError, RuntimeError) as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
+@app.post("/v1/native/engines/{engine}/stop")
+def native_engine_stop(engine: EngineName) -> dict:
+    try:
+        return process_manager().stop(engine)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
+@app.post("/v1/native/engines/{engine}/{phase}")
+def native_engine_phase(engine: EngineName, phase: str) -> dict:
+    if phase not in {"install", "build", "test"}:
+        raise HTTPException(status_code=404, detail="phase must be install, build, or test")
+    try:
+        results = process_manager().run_phase(engine, phase)
+    except (ValueError, FileNotFoundError, RuntimeError) as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    return {"engine": engine.value, "phase": phase, "results": results}
 
 
 @app.post("/v1/route", response_model=RouteDecision)
@@ -76,7 +165,12 @@ def create_asset(request: AssetCreate) -> AssetVersion:
         content = base64.b64decode(request.content_base64, validate=True)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail="content_base64 is not valid base64") from exc
-    return assets().create(name=request.name, media_type=request.media_type, content=content, actor=request.actor)
+    return assets().create(
+        name=request.name,
+        media_type=request.media_type,
+        content=content,
+        actor=request.actor,
+    )
 
 
 @app.get("/v1/provenance/{provenance_id}")

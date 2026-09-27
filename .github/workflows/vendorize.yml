@@ -1,0 +1,70 @@
+name: Vendor Complete Engine Sources
+
+on:
+  push:
+    branches: [feat/nexus-inhouse-engines]
+    paths:
+      - sources.lock.json
+      - engines.runtime.json
+      - scripts/vendor_sources.py
+      - scripts/verify_vendored.py
+      - scripts/verify_engine_contracts.py
+      - .github/workflows/vendorize.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nexus-vendor-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: false
+          lfs: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Verify immutable source lock
+        run: python scripts/verify_lock.py
+
+      - name: Materialize and stage canonical engine trees
+        run: python scripts/vendor_sources.py
+
+      - name: Verify canonical vendored integrity
+        run: python scripts/verify_vendored.py --require
+
+      - name: Verify capability roots
+        run: python scripts/verify_engine_contracts.py
+
+      - name: Test Nexus integration layer against vendored layout
+        run: |
+          python -m pip install -U pip
+          pip install -e '.[dev]'
+          python -m compileall -q nexus_workspace scripts tests
+          pytest
+
+      - name: Commit complete in-tree engine implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --cached --quiet; then
+            echo "Vendored tree already matches the source lock."
+            exit 0
+          fi
+          git commit -m "vendor: canonicalize all in-house engine source trees [vendor-generated]"
+          git push origin HEAD:${GITHUB_REF_NAME}
