@@ -1,6 +1,8 @@
 name: Vendored Engine Native Parity
 
 on:
+  pull_request:
+    branches: [main]
   workflow_dispatch:
     inputs:
       engine:
@@ -8,18 +10,18 @@ on:
         required: true
         default: all
       phase:
-        description: "Native phase: install, build, or test"
+        description: "Phase for manual runs"
         required: true
-        default: test
+        default: full
         type: choice
-        options: [install, build, test]
+        options: [full, install, build, test]
 
 permissions:
   contents: read
 
 jobs:
   parity:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 180
     strategy:
       fail-fast: false
@@ -35,12 +37,13 @@ jobs:
           - pageindex
           - agent-reach
           - qwen-audio-agent
+
     steps:
       - name: Select engine
         id: select
         shell: bash
         run: |
-          if [[ "${{ inputs.engine }}" == "all" || "${{ inputs.engine }}" == "${{ matrix.engine }}" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" || "${{ inputs.engine }}" == "all" || "${{ inputs.engine }}" == "${{ matrix.engine }}" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -66,17 +69,35 @@ jobs:
         with:
           go-version: '1.24.x'
 
+      - name: Enable Corepack
+        if: steps.select.outputs.run == 'true'
+        run: corepack enable
+
       - name: Install uv
         if: steps.select.outputs.run == 'true'
         uses: astral-sh/setup-uv@v6
 
-      - name: Verify vendored source before native phase
+      - name: Verify source before native parity
         if: steps.select.outputs.run == 'true'
         run: |
           python scripts/verify_lock.py
           python scripts/verify_vendored.py --require
           python scripts/verify_engine_contracts.py
 
-      - name: Run selected native phase
-        if: steps.select.outputs.run == 'true'
-        run: python scripts/engine_tasks.py '${{ inputs.phase }}' --engine '${{ matrix.engine }}' --stop-on-failure
+      - name: Install native dependencies
+        if: >-
+          steps.select.outputs.run == 'true' &&
+          (github.event_name == 'pull_request' || inputs.phase == 'full' || inputs.phase == 'install')
+        run: python scripts/engine_tasks.py install --engine '${{ matrix.engine }}' --stop-on-failure
+
+      - name: Build native engine
+        if: >-
+          steps.select.outputs.run == 'true' &&
+          (github.event_name == 'pull_request' || inputs.phase == 'full' || inputs.phase == 'build')
+        run: python scripts/engine_tasks.py build --engine '${{ matrix.engine }}' --stop-on-failure
+
+      - name: Test native engine
+        if: >-
+          steps.select.outputs.run == 'true' &&
+          (github.event_name == 'pull_request' || inputs.phase == 'full' || inputs.phase == 'test')
+        run: python scripts/engine_tasks.py test --engine '${{ matrix.engine }}' --stop-on-failure
