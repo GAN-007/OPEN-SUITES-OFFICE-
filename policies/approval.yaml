@@ -1,0 +1,14 @@
+version: 1
+risk_classes:
+  read:
+    approval_required: false
+  write:
+    approval_required: false
+  external_side_effect:
+    approval_required: true
+examples_of_external_side_effects:
+  - submitting_web_forms
+  - sending_messages
+  - making_purchases
+  - publishing_content
+  - deleting_remote_resources

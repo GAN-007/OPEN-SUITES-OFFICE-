@@ -1,0 +1,12 @@
+OPEN SUITES OFFICE — Nexus
+Copyright 2026 GAN-007
+
+This repository federates independently licensed upstream projects through Git
+submodules. No upstream copyright or trademark ownership is claimed here.
+Review each upstream project's LICENSE, NOTICE, third-party notices and branding
+terms before redistribution.
+
+Open WebUI currently has branding-preservation requirements in its upstream
+license. GenOffice's upstream repository also contains an ee/ directory with a
+separate enterprise license. Nexus keeps these boundaries intact by pinning the
+complete repositories as independent submodules rather than relicensing them.
