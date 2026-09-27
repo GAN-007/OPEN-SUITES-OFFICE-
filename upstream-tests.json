@@ -98,7 +98,33 @@
       "install": [
         [
           "uv",
-          "sync"
+          "sync",
+          "--extra",
+          "api",
+          "--extra",
+          "docs",
+          "--extra",
+          "evals",
+          "--extra",
+          "ollama",
+          "--extra",
+          "dev",
+          "--extra",
+          "neo4j",
+          "--extra",
+          "redis",
+          "--extra",
+          "tracing",
+          "--extra",
+          "postgres",
+          "--extra",
+          "aws",
+          "--extra",
+          "neptune",
+          "--extra",
+          "langchain",
+          "--extra",
+          "dlt"
         ]
       ],
       "build": [],
@@ -106,7 +132,9 @@
         [
           "uv",
           "run",
-          "pytest"
+          "pytest",
+          "cognee/tests/unit",
+          "--import-mode=importlib"
         ]
       ]
     },
@@ -139,9 +167,9 @@
       ],
       "build": [
         [
-          "npm",
-          "run",
-          "build"
+          "bash",
+          "-lc",
+          "NODE_OPTIONS=--max-old-space-size=6144 npm run build"
         ]
       ],
       "test": [
@@ -162,6 +190,13 @@
           "install",
           "-e",
           "."
+        ],
+        [
+          "python3",
+          "-m",
+          "pip",
+          "install",
+          "pytest>=7"
         ]
       ],
       "build": [],
