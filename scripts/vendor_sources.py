@@ -3,9 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import shutil
-import stat
 import subprocess
 import sys
 import tempfile
@@ -37,6 +35,22 @@ def run(
             details = f"\nstdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
         raise RuntimeError(f"Command failed ({proc.returncode}): {' '.join(command)}{details}")
     return proc.stdout.strip() if capture else ""
+
+
+def run_bytes(command: list[str], cwd: Path, input_bytes: bytes | None = None) -> bytes:
+    proc = subprocess.run(
+        command,
+        cwd=str(cwd),
+        input=input_bytes,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if proc.returncode != 0:
+        raise RuntimeError(
+            f"Command failed ({proc.returncode}): {' '.join(command)}\n"
+            f"{proc.stderr.decode('utf-8', errors='replace')}"
+        )
+    return proc.stdout
 
 
 def remove_git_metadata(root: Path) -> None:
@@ -74,25 +88,73 @@ def git_tree_for_checkout(checkout: Path, excluded_paths: list[str]) -> tuple[st
     original = run(["git", "rev-parse", "HEAD^{tree}"], checkout, capture=True)
     if not excluded_paths:
         return original, original
-
     for relative in excluded_paths:
         run(["git", "rm", "-r", "--cached", "--ignore-unmatch", "--", relative], checkout)
     expected = run(["git", "write-tree"], checkout, capture=True)
     return original, expected
 
 
-def index_entries(prefix: str) -> list[tuple[str, str, str]]:
-    raw = run(["git", "ls-files", "-s", "-z", "--", prefix], ROOT, capture=True)
-    entries: list[tuple[str, str, str]] = []
+def ls_index(cwd: Path, prefix: str | None = None) -> dict[str, tuple[str, str]]:
+    command = ["git", "ls-files", "-s", "-z"]
+    if prefix:
+        command.extend(["--", prefix])
+    raw = run(command, cwd, capture=True)
+    result: dict[str, tuple[str, str]] = {}
     for record in raw.split("\0"):
         if not record:
             continue
         metadata, path = record.split("\t", 1)
         mode, sha, stage = metadata.split(" ")
         if stage != "0":
-            raise RuntimeError(f"Unmerged index entry while vendoring: {path}")
-        entries.append((mode, sha, path))
-    return entries
+            raise RuntimeError(f"Unmerged index entry: {path}")
+        result[path] = (mode, sha)
+    return result
+
+
+def import_blob(checkout: Path, sha: str) -> None:
+    content = run_bytes(["git", "cat-file", "blob", sha], checkout)
+    actual = run_bytes(["git", "hash-object", "-w", "--stdin"], ROOT, content).decode().strip()
+    if actual != sha:
+        raise RuntimeError(f"Blob import mismatch: expected {sha}, wrote {actual}")
+
+
+def canonicalize_target_index(checkout: Path, source_path: str) -> int:
+    source_entries = ls_index(checkout)
+    target_entries = ls_index(ROOT, source_path)
+    target_by_relative = {
+        path[len(source_path) + 1 :]: value
+        for path, value in target_entries.items()
+        if path.startswith(source_path + "/")
+    }
+
+    if any(mode == "160000" for mode, _sha in source_entries.values()):
+        raise RuntimeError(
+            f"{source_path}: nested Git submodule entries require explicit flattening support"
+        )
+
+    corrections = 0
+    for relative in sorted(set(target_by_relative) - set(source_entries)):
+        run(["git", "update-index", "--force-remove", "--", f"{source_path}/{relative}"], ROOT)
+        corrections += 1
+
+    for relative, (mode, expected_sha) in source_entries.items():
+        target = f"{source_path}/{relative}"
+        current = target_by_relative.get(relative)
+        if current == (mode, expected_sha):
+            continue
+        import_blob(checkout, expected_sha)
+        run(
+            ["git", "update-index", "--add", "--cacheinfo", f"{mode},{expected_sha},{target}"],
+            ROOT,
+        )
+        corrections += 1
+
+    return corrections
+
+
+def index_entries(prefix: str) -> list[tuple[str, str, str]]:
+    entries = ls_index(ROOT, prefix)
+    return [(mode, sha, path) for path, (mode, sha) in entries.items()]
 
 
 def blob_sizes(shas: list[str]) -> dict[str, int]:
@@ -129,7 +191,6 @@ def target_subtree_sha(prefix: str) -> str:
 def remove_legacy_gitlinks(lock: dict) -> None:
     if (ROOT / ".gitmodules").exists():
         run(["git", "rm", "-f", ".gitmodules"], ROOT)
-
     for source in lock["sources"]:
         legacy = source.get("legacy_submodule_path")
         if not legacy:
@@ -155,11 +216,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Vendor the exact pinned engine source trees into this repository."
     )
-    parser.add_argument(
-        "--keep-legacy-submodules",
-        action="store_true",
-        help="Do not remove the old upstream/* gitlinks after vendoring.",
-    )
+    parser.add_argument("--keep-legacy-submodules", action="store_true")
     args = parser.parse_args()
 
     lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
@@ -167,7 +224,6 @@ def main() -> int:
     if not isinstance(sources, list) or len(sources) != 10:
         raise RuntimeError("sources.lock.json must contain exactly ten engines")
 
-    # Remove any previously vendored engine files from both worktree and index.
     subprocess.run(
         ["git", "rm", "-r", "-f", "--cached", "--ignore-unmatch", "engines"],
         cwd=ROOT,
@@ -195,7 +251,6 @@ def main() -> int:
                 run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], clone, capture=True)
             except RuntimeError:
                 run(["git", "fetch", "--depth", "1", "origin", commit], clone)
-
             run(
                 ["git", "-c", "advice.detachedHead=false", "checkout", "--detach", commit],
                 clone,
@@ -229,38 +284,44 @@ def main() -> int:
                     "excluded_paths": excluded,
                     "restriction": source.get("restriction"),
                     "nested_submodules_materialized": nested_submodules,
+                    "_checkout": clone,
                 }
             )
 
-    if not args.keep_legacy_submodules:
-        remove_legacy_gitlinks(lock)
+        if not args.keep_legacy_submodules:
+            remove_legacy_gitlinks(lock)
 
-    # Stage root changes normally, then force-stage engine trees so files tracked
-    # upstream remain tracked even when their own nested .gitignore matches them.
-    run(["git", "add", "-A"], ROOT)
-    run(["git", "add", "-f", "--", "engines"], ROOT)
+        run(["git", "add", "-A"], ROOT)
+        run(["git", "add", "-f", "--", "engines"], ROOT)
 
-    results: list[dict] = []
-    for item in provisional:
-        prefix = item["vendored_path"]
-        entries = index_entries(prefix)
-        subtree = target_subtree_sha(prefix)
-        if subtree != item["expected_vendored_tree_sha"]:
-            raise RuntimeError(
-                f"{item['name']}: staged Git tree {subtree} does not match "
-                f"the canonical upstream tree {item['expected_vendored_tree_sha']}"
+        for item in provisional:
+            corrections = canonicalize_target_index(item["_checkout"], item["vendored_path"])
+            item["canonical_index_corrections"] = corrections
+            print(f"==> {item['name']}: canonical index corrections={corrections}")
+
+        results: list[dict] = []
+        for item in provisional:
+            checkout = item.pop("_checkout")
+            del checkout
+            prefix = item["vendored_path"]
+            entries = index_entries(prefix)
+            subtree = target_subtree_sha(prefix)
+            if subtree != item["expected_vendored_tree_sha"]:
+                raise RuntimeError(
+                    f"{item['name']}: canonicalized Git tree {subtree} does not match "
+                    f"upstream {item['expected_vendored_tree_sha']}"
+                )
+            sizes = blob_sizes([sha for _mode, sha, _path in entries])
+            results.append(
+                {
+                    **item,
+                    "git_tree_sha": subtree,
+                    "tracked_entry_count": len(entries),
+                    "canonical_blob_bytes": sum(
+                        sizes[sha] for _mode, sha, _path in entries
+                    ),
+                }
             )
-
-        sizes = blob_sizes([sha for _mode, sha, _path in entries])
-        total_bytes = sum(sizes[sha] for _mode, sha, _path in entries)
-        results.append(
-            {
-                **item,
-                "git_tree_sha": subtree,
-                "tracked_entry_count": len(entries),
-                "canonical_blob_bytes": total_bytes,
-            }
-        )
 
     manifest = {
         "schema_version": 2,
