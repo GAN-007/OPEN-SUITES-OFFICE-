@@ -27,6 +27,16 @@ class Settings(BaseSettings):
     system_one_timeout_seconds: float = Field(default=1.5, ge=0.1, le=30)
     system_one_confidence_threshold: float = Field(default=0.85, ge=0.0, le=1.0)
 
+    # Shared GAN Decision Plane provider gateway. Calling applications can point
+    # their /v1/systemone clients here instead of coupling directly to Laya/Jev.
+    decision_plane_primary_provider: str = "laya"
+    decision_plane_fallback_provider: str | None = None
+    decision_plane_timeout_seconds: float = Field(default=1.5, ge=0.1, le=30)
+    laya_base_url: str | None = None
+    laya_api_key: str | None = None
+    jev_base_url: str | None = None
+    jev_api_key: str | None = None
+
     openmaic_url: str | None = None
     weknora_url: str | None = None
     graphiti_mcp_url: str | None = None
