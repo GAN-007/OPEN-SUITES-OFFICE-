@@ -63,12 +63,47 @@ The service exposes:
 
 - `GET /health` — Nexus and adapter configuration status.
 - `GET /v1/engines` — all ten engine transports.
+- `GET /v1/systemone/health` — shared GAN Decision Plane provider readiness without exposing secrets.
+- `POST /v1/systemone` — Jev-compatible typed decision gateway with configurable Laya/Jev primary/fallback providers.
 - `POST /v1/route` — deterministic capability ownership routing.
 - `POST /v1/execute` — execute through the selected adapter with approval enforcement and provenance.
 - `POST /v1/assets` — create immutable content-addressed asset versions.
 - `GET /v1/provenance/{id}` — retrieve the audit chain for an execution.
 
 Interactive OpenAPI documentation is served at `/docs`.
+
+## Shared GAN Decision Plane
+
+Nexus now also hosts the common System-One gateway used by the wider GAN project
+ecosystem. Calling applications keep their own domain-specific questions and
+policy boundaries, but can point their existing System-One base URL at Nexus
+instead of coupling directly to one model vendor.
+
+The gateway preserves the incoming `state + questions` contract and forwards it
+to a configured provider at `/v1/systemone`. It currently supports Laya and
+Jev-compatible HTTP providers, with optional ordered failover. Provider failures
+produce a gateway error; calling applications retain their existing fail-open or
+human-review behavior.
+
+Example local configuration:
+
+```bash
+NEXUS_DECISION_PLANE_PRIMARY_PROVIDER=laya
+NEXUS_DECISION_PLANE_FALLBACK_PROVIDER=
+NEXUS_LAYA_BASE_URL=http://127.0.0.1:8000
+NEXUS_LAYA_API_KEY=
+```
+
+A calling project can then use:
+
+```bash
+<PROJECT>_SYSTEM_ONE_BASE_URL=http://nexus-host:8787
+```
+
+The gateway never authorizes project actions. GALIKA submission gates, HMS
+clinical supervision, HR permissions, SEVI finance/credit controls, telephony
+tool authority, trading risk controls and every other domain-specific policy
+remain authoritative in their respective applications.
 
 ## Infrastructure
 
