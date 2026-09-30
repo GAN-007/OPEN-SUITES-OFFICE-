@@ -96,3 +96,30 @@ class EngineStatus(BaseModel):
     transport: str
     endpoint: str | None = None
     command: list[str] | None = None
+
+
+class SystemOneQuestion(BaseModel):
+    type: str
+    instructions: str | None = None
+    criteria: dict[str, str] | list[str] | None = None
+
+    @classmethod
+    def _allowed_types(cls) -> set[str]:
+        return {"choice", "score", "noul"}
+
+    def model_post_init(self, __context: Any) -> None:
+        if self.type not in self._allowed_types():
+            raise ValueError("System-One question type must be choice, score, or noul")
+        if self.type == "choice":
+            if not isinstance(self.criteria, dict) or not self.criteria:
+                raise ValueError("choice questions require a non-empty criteria object")
+        elif self.type == "score":
+            if not isinstance(self.criteria, list) or not self.criteria:
+                raise ValueError("score questions require a non-empty criteria list")
+        elif self.criteria is not None and not isinstance(self.criteria, (dict, list)):
+            raise ValueError("noul criteria must be omitted, a list, or an object")
+
+
+class SystemOneGatewayRequest(BaseModel):
+    state: Any
+    questions: dict[str, SystemOneQuestion] = Field(min_length=1, max_length=100)
